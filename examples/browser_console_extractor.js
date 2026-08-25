@@ -116,20 +116,53 @@
     var auth = FOUND["authorization"];
     if (!/^basic\s/i.test(auth)) auth = "Basic " + auth;
     var cfg = { auth_token: auth, user_id: FOUND["x-user-id"], device_key: FOUND["x-device-key"] };
+    var cfgJson = JSON.stringify(cfg, null, 2);
 
     setToast("<div style='font-weight:bold'>\u2713 Credentials captured!</div>" +
       "<div style='margin-top:6px;white-space:pre-wrap'>" +
       "auth_token: " + auth.slice(0, 12) + "...(truncated)\n" +
       "user_id: " + cfg.user_id + "\n" +
       "device_key: " + cfg.device_key + "</div>" +
-      "<div style='margin-top:6px'>Full config.json printed in the Console.</div>");
+      "<button id='__jc_copy' style='margin-top:8px;padding:6px 14px;border:0;" +
+      "border-radius:6px;background:#fff;color:#b3266e;font-weight:bold;" +
+      "cursor:pointer'>Copy config.json</button>" +
+      "<div id='__jc_copied' style='margin-top:4px;display:none'>Copied! Now run:" +
+      "<br><b>python examples/setup_credentials.py --from-curl</b> is NOT needed -" +
+      "<br>paste into config.json or setup prompts.</div>");
     setTimeout(restore, 60000); // leave the green toast readable
+
+    // Wire the copy button (full JSON straight to the clipboard).
+    setTimeout(function () {
+      var btn = document.getElementById("__jc_copy");
+      if (!btn) return;
+      btn.addEventListener("click", function () {
+        function done() {
+          btn.style.background = "#0a7d32";
+          btn.style.color = "#fff";
+          btn.textContent = "Copied \u2713";
+          var note = document.getElementById("__jc_copied");
+          if (note) note.style.display = "block";
+        }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(cfgJson).then(done, done);
+        } else {
+          var ta = document.createElement("textarea");
+          ta.value = cfgJson;
+          document.body.appendChild(ta);
+          ta.select();
+          try { document.execCommand("copy"); } catch (e) {}
+          document.body.removeChild(ta);
+          done();
+        }
+      });
+    }, 0);
 
     console.log("%c========== Jio AI Cloud credentials captured ========== ",
                 "color:#fff;background:#0a7d32;font-weight:bold;padding:2px 6px");
-    console.log(JSON.stringify(cfg, null, 2));
-    console.log("%c Copy the object above into config.json, or re-run:  " +
-                "python examples/setup_credentials.py   and paste the three values.",
+    console.log(cfgJson);
+    console.log("%c Or click 'Copy config.json' on the page overlay, then paste " +
+                "into config.json (or feed the three values to " +
+                "python examples/setup_credentials.py).",
                 "color:#0a7d32;font-weight:bold");
     console.log("Requests inspected:", CAPTURED_URLS);
   }
