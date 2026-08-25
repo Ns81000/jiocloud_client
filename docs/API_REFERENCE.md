@@ -40,7 +40,7 @@ User-Agent, Accept-Language
 {
   "userId": "…", "authProviderId": 4, "emailId": "…",
   "firstName": "…", "status": "A",
-  "rootFolderKey": "20E0E5275DFE2C23E063441618ACCF27",   // per-account
+  "rootFolderKey": "0123456789ABCDEF0123456789ABCDEF",   // per-account
   "isMobileNumVerified": true, "isEmailIdVerified": true,
   "mobileNumber": "+916****8825",
   "quota": { "allocatedSpace": 107374182400, "usedSpace": …,

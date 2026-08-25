@@ -25,8 +25,11 @@ classifiers = [
 dependencies = []
 
 [project.urls]
-# Fill in when the repository is published
-# Homepage = "https://github.com/YOUR_ACCOUNT/jiocloud_client"
+Homepage = "https://github.com/Ns81000/jiocloud_client"
+Documentation = "https://ns81000.github.io/jiocloud_client/"
+Repository = "https://github.com/Ns81000/jiocloud_client"
+Issues = "https://github.com/Ns81000/jiocloud_client/issues"
+Changelog = "https://github.com/Ns81000/jiocloud_client/blob/main/CHANGELOG.md"
 
 [project.scripts]
 jiocloud = "cli:main"

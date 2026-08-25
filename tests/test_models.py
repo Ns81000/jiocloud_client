@@ -43,7 +43,7 @@ class TestJioModels(unittest.TestCase):
     def test_file_model(self):
         data = {
             "objectKey": "24074a0d843347ac880c3c113847ba6a",
-            "parentObjectKey": "20E0E5275DFE2C23E063441618ACCF27",
+            "parentObjectKey": "0123456789ABCDEF0123456789ABCDEF",
             "objectType": "FE",
             "objectName": "Test_Document.pdf",
             "mimeType": "application",
@@ -66,7 +66,7 @@ class TestJioModels(unittest.TestCase):
     def test_folder_model(self):
         data = {
             "objectKey": "5985F022E2320359E063E31718AC27A5",
-            "parentObjectKey": "20E0E5275DFE2C23E063441618ACCF27",
+            "parentObjectKey": "0123456789ABCDEF0123456789ABCDEF",
             "objectType": "FR",
             "objectName": "Work",
             "status": "A",
