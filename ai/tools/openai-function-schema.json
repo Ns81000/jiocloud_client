@@ -1,0 +1,330 @@
+{
+  "tools": [
+    {
+      "type": "function",
+      "function": {
+        "name": "account_info",
+        "description": "Get account profile, storage quota and usage breakdown for the connected Jio AI Cloud account.",
+        "parameters": {
+          "type": "object",
+          "properties": {}
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "list_files",
+        "description": "List files in a cloud folder. Omit folder_key to use the account root. Returns name, key, size, dates.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "folder_key": {
+              "type": "string",
+              "description": "Parent folder objectKey; omit for root"
+            },
+            "limit": {
+              "type": "integer",
+              "default": 50
+            },
+            "sort": {
+              "type": "string",
+              "default": "-fileCreatedDate"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "search_files",
+        "description": "Search ALL files in the account by name/source-path substring and optional extension filter.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "query": {
+              "type": "string"
+            },
+            "extension": {
+              "type": "string",
+              "description": "e.g. pdf, docx (no dot needed)"
+            }
+          },
+          "required": [
+            "query"
+          ]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "download_file",
+        "description": "Download one file by objectKey to a local path. Requires confirm=true because it writes to local disk.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "object_key": {
+              "type": "string"
+            },
+            "destination": {
+              "type": "string"
+            },
+            "confirm": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "object_key",
+            "destination",
+            "confirm"
+          ]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "download_all",
+        "description": "Bulk-download every file (optionally filtered by extension) into a local directory with parallel workers. Requires confirm=true.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "destination_dir": {
+              "type": "string"
+            },
+            "extension": {
+              "type": "string"
+            },
+            "max_workers": {
+              "type": "integer",
+              "default": 4
+            },
+            "confirm": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "destination_dir",
+            "confirm"
+          ]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "create_folder",
+        "description": "Create a new folder in the cloud (mutating).",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "parent_folder_key": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "name"
+          ]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "move_to_trash",
+        "description": "Move one or more objects to trash (destructive but reversible). Requires confirm=true.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "object_keys": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "confirm": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "object_keys",
+            "confirm"
+          ]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "restore_from_trash",
+        "description": "Restore previously trashed objects back to their original location. Requires confirm=true.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "object_keys": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "confirm": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "object_keys",
+            "confirm"
+          ]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "list_trash",
+        "description": "List items currently in the account trash.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "limit": {
+              "type": "integer",
+              "default": 100
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "share_link",
+        "description": "Create a public share link for one or more objects (makes data publicly accessible to anyone with the URL). Requires confirm=true.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "object_keys": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "confirm": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "object_keys",
+            "confirm"
+          ]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "rename_object",
+        "description": "Rename a file or folder (mutating).",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "object_key": {
+              "type": "string"
+            },
+            "new_name": {
+              "type": "string"
+            },
+            "is_folder": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          "required": [
+            "object_key",
+            "new_name"
+          ]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "set_favorite",
+        "description": "Favorite or unfavorite one or more objects.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "object_keys": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "favorite": {
+              "type": "boolean",
+              "default": true
+            }
+          },
+          "required": [
+            "object_keys"
+          ]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "version_history",
+        "description": "List version history entries for a file.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "object_key": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "object_key"
+          ]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "recent_activity",
+        "description": "Recent files feed (photos/docs) as shown on the web home screen.",
+        "parameters": {
+          "type": "object",
+          "properties": {}
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "list_boards",
+        "description": "List shared boards / photo albums.",
+        "parameters": {
+          "type": "object",
+          "properties": {}
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "get_contacts",
+        "description": "Fetch cloud-synced contacts (for share suggestions).",
+        "parameters": {
+          "type": "object",
+          "properties": {}
+        }
+      }
+    }
+  ]
+}
