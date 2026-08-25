@@ -100,8 +100,10 @@ def do_validate_and_write(auth_token: str, user_id: str, device_key: str, force:
 
     peek = auth.peek_token_identity()
     if peek and peek.lower() != user_id.lower():
-        print(f"\nWARNING: decoded token identity ({peek[:8]}...) does not match "
-              f"user_id ({user_id[:8]}...). Continuing anyway, but double-check.")
+        print(f"\nNOTE: decoded token identity ({peek[:8]}...) differs from "
+              f"user_id ({user_id[:8]}...).")
+        print("This is expected after a re-login (see docs/KNOWN_ISSUES.md "
+              "ISSUE-008) and is harmless when validation below succeeds.")
 
     print(f"\nValidating credentials against {VALIDATE_URL} ...")
     try:
@@ -269,8 +271,10 @@ def main() -> None:
 
     peek = auth.peek_token_identity()
     if peek and peek.lower() != user_id.lower():
-        print(f"\nWARNING: decoded token identity ({peek[:8]}...) does not match "
-              f"user_id ({user_id[:8]}...). Continuing anyway, but double-check.")
+        print(f"\nNOTE: decoded token identity ({peek[:8]}...) differs from "
+              f"user_id ({user_id[:8]}...).")
+        print("This is expected after a re-login (see docs/KNOWN_ISSUES.md "
+              "ISSUE-008) and is harmless when validation below succeeds.")
 
     print(f"\nValidating credentials against {VALIDATE_URL} ...")
     try:

@@ -129,6 +129,35 @@ UI and open an issue with the (redacted) request shape.
 
 ---
 
+## CAVEATS: ISSUE-008: Token identity segment can differ from `X-User-Id` after re-login
+
+Discovered 2026-08-25 during credential-rotation testing
+(`examples/setup_credentials.py`).
+
+The Basic token decodes best-effort to `<id>#ATK#<payload>` (see
+`JioCloudAuth.peek_token_identity()`). On the original capture, `<id>`
+matched the `X-User-Id` header exactly. After logging out and back in,
+the freshly captured token decodes to a **different** id (`96ef07b0...`)
+while the browser keeps sending the same `X-User-Id` (`bbaac1b8...`) —
+and the server **accepts the pair** (`GET /security/users` → 200 with the
+correct profile).
+
+Implications:
+
+- The token's embedded id is evidently NOT always the account user id
+  (possibly a per-session or per-device identifier). Do not rely on it.
+- `peek_token_identity()` mismatches are **advisory only**;
+  `setup_credentials.py` warns but proceeds, which is correct behavior.
+- Live verification (26/26 on 2026-08-25) ran under the OLD pairing; the
+  NEW pairing also validates. Contributor idea: probe whether the same
+  token works with a *wrong* X-User-Id to map how strictly the server
+  binds these values.
+
+**How to help:** if you rotate sessions, run `python tests/live_verify.py`
+afterwards and report whether all checks pass under the new pairing.
+
+---
+
 ## Verification environment
 
 Findings above reproduced 2026-08-25 against production with a free-tier
