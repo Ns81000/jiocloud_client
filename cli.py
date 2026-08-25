@@ -4,7 +4,7 @@ Jio AI Cloud - Command Line Interface (CLI)
 Interact with your Jio Cloud storage directly from your terminal.
 
 UNOFFICIAL TOOL — for personal backup / data portability of YOUR OWN account.
-Not affiliated with Reliance Jio Infocomm Ltd. See DISCLAIMER.md.
+Not affiliated with Reliance Jio Infocomm Ltd. See docs/DISCLAIMER.md.
 """
 
 import argparse

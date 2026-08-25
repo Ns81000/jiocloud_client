@@ -1,0 +1,39 @@
+name: Deploy docs site
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "docs/**"
+      - "mkdocs.yml"
+      - ".github/workflows/deploy-docs.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install MkDocs Material
+        run: pip install mkdocs-material
+
+      - name: Build (strict)
+        run: mkdocs build --strict --site-dir site
+
+      - name: Copy llms.txt files into the built site
+        run: |
+          cp llms.txt llms-full.txt site/
+          ls -la site/llms*.txt
+
+      - name: Deploy to GitHub Pages
+        run: mkdocs gh-deploy --force --no-history

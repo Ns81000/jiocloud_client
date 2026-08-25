@@ -6,7 +6,7 @@ Demonstrates the machine-readable tool interface that lets AI agents
 inspect, search, download, and manage files via strict JSON envelopes.
 
 UNOFFICIAL PROJECT — personal backup / data-portability use only.
-Not affiliated with Reliance Jio Infocomm Ltd. See DISCLAIMER.md.
+Not affiliated with Reliance Jio Infocomm Ltd. See docs/DISCLAIMER.md.
 
 Usage:
     python examples/06_agent_integration.py            # demo of safe read-only calls

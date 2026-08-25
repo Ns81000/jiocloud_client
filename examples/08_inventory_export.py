@@ -6,7 +6,7 @@ account: every file with keys, sizes, types and dates — plus per-extension
 analytics. Output feeds directly into spreadsheets / data pipelines.
 
 UNOFFICIAL PROJECT — personal backup / data-portability use only.
-Not affiliated with Reliance Jio Infocomm Ltd. See DISCLAIMER.md.
+Not affiliated with Reliance Jio Infocomm Ltd. See docs/DISCLAIMER.md.
 
 Usage:
     python examples/08_inventory_export.py [--out inventory] [--config config.json]

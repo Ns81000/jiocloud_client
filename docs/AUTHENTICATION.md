@@ -18,7 +18,7 @@ Every request — **including bodiless GETs** — must carry:
 
 The SDK builds all of this in `jiocloud.auth.JioCloudAuth.get_headers()`.
 Contacts endpoints additionally require `X-Offset` / `X-CHUNK-SIZE`
-(see [API_REFERENCE.md](API_REFERENCE.md §5)).
+(see [API_REFERENCE.md](API_REFERENCE.md), section 5).
 
 ## 2. Extracting Your Own Session Credentials
 

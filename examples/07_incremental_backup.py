@@ -7,7 +7,7 @@ Practical batch workflow:
   3. Optionally prunes local copies of files deleted from the cloud.
 
 UNOFFICIAL PROJECT — personal backup / data-portability use only.
-Not affiliated with Reliance Jio Infocomm Ltd. See DISCLAIMER.md.
+Not affiliated with Reliance Jio Infocomm Ltd. See docs/DISCLAIMER.md.
 
 Usage:
     python examples/07_incremental_backup.py ./backup_dir [--prune] [--dry-run]

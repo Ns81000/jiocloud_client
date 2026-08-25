@@ -54,7 +54,7 @@ Note: some rejections carry **no error message at all** — just the bare
 object key. The SDK treats any entry in `unprocessed[]` as an
 `InvalidRequestError` and never reports silent failure as success.
 Historical example: the legacy `PUT /nms/metadata/delete` endpoint began
-rejecting every key this way after 2026-08-24 (see KNOWN_ISSUES.md
+rejecting every key this way after 2026-08-24 (see docs/KNOWN_ISSUES.md
 ISSUE-001); the fix routes deletes through the `TRASH` batch op with
 `status:"T"`.
 

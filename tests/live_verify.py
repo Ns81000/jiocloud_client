@@ -4,7 +4,7 @@ Jio AI Cloud endpoints. Read-only methods run unconditionally; mutating
 methods run as create->verify->cleanup cycles so the account is left clean.
 Prints a PASS/FAIL matrix and exits non-zero on any failure.
 
-UNOFFICIAL PROJECT — run only against an account you own. See DISCLAIMER.md.
+UNOFFICIAL PROJECT — run only against an account you own. See docs/DISCLAIMER.md.
 """
 
 import sys

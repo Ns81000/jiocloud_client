@@ -134,4 +134,4 @@ Run `python tests/live_verify.py` yourself to reproduce the matrix locally.
 > web session is logged out or refreshed. A run against an expired token
 > shows every check failing with `AuthenticationError: 401 TEJGA0401` — that
 > is the SDK working correctly (typed errors, no silent retries). Refresh
-> `config.json` per [docs/AUTHENTICATION.md](docs/AUTHENTICATION.md) §2 and re-run.
+> `config.json` per [AUTHENTICATION.md](AUTHENTICATION.md), section 2, and re-run.

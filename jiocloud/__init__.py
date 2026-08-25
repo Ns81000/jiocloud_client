@@ -6,7 +6,7 @@ with, associated with, authorized by, endorsed by, or in any way officially
 connected with Reliance Jio Infocomm Ltd. or any of its subsidiaries.
 "Jio" and "Jio AI Cloud" are trademarks of their respective owners; they are
 used here solely for nominative reference to the service this tool
-interoperates with. See DISCLAIMER.md and LEGAL.md.
+interoperates with. See docs/DISCLAIMER.md and docs/LEGAL.md.
 
 This software is provided for personal data portability, interoperability,
 and educational backup purposes under fair-use guidelines, "AS IS", without

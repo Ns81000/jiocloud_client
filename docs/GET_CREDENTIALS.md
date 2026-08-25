@@ -2,7 +2,7 @@
 
 UNSTABLE TARGET WARNING — Last verified: 2026-08-25 (26/26 live checks passed).
 Jio AI Cloud has no public API; endpoints change without notice and can break
-at any time. Check [KNOWN_ISSUES.md](../KNOWN_ISSUES.md) for current status.
+at any time. Check [KNOWN_ISSUES.md](KNOWN_ISSUES.md) for current status.
 
 ---
 
@@ -13,7 +13,7 @@ This guide shows you how to extract the three session values the SDK needs
 
 - **Your own Jio AI Cloud account only.** Extracting another person's session
   credentials without authorization is illegal and explicitly against this
-  project's terms ([DISCLAIMER.md](../DISCLAIMER.md)).
+  project's terms ([DISCLAIMER.md](DISCLAIMER.md)).
 - Chrome or any Chromium browser (Edge works identically).
 - About two minutes.
 
@@ -34,7 +34,7 @@ The three values:
 1. Log in at <https://www.jioaicloud.com>.
 2. Press **F12** → open the **Console** tab.
 3. Paste the entire contents of
-   [`examples/browser_console_extractor.js`](../examples/browser_console_extractor.js)
+   [`examples/browser_console_extractor.js`](https://github.com/Ns81000/jiocloud_client/blob/main/examples/browser_console_extractor.js)
    and press Enter. (Canonical copy lives in that file; the block below is the
    same script.)
 4. While it watches (about 20 seconds), click around the app — open *My Files*,

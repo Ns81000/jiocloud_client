@@ -7,7 +7,7 @@ Every endpoint implemented here was verified against live traffic captures
 
 UNOFFICIAL PROJECT — not affiliated with, endorsed by, or connected to
 Reliance Jio Infocomm Ltd. Intended strictly for personal backup and data
-portability of YOUR OWN account. See DISCLAIMER.md / LEGAL.md.
+portability of YOUR OWN account. See docs/DISCLAIMER.md / docs/LEGAL.md.
 """
 
 import json
@@ -736,7 +736,7 @@ class JioCloudClient:
         issues batch op "TRASH" against PUT /nms/metadata/1.0 with the FULL
         object echo AND `"status": "T"` pre-set in the request payload.
         (The legacy PUT /nms/metadata/delete endpoint now silently rejects
-        every key into unprocessed[] — see KNOWN_ISSUES.md.)
+        every key into unprocessed[] — see docs/KNOWN_ISSUES.md.)
 
         Raises InvalidRequestError if any op lands in unprocessed[].
         """

@@ -1,0 +1,67 @@
+site_name: jiocloud-client
+site_description: >-
+  Unofficial Jio AI Cloud Python SDK, CLI & AI-agent tool server — personal
+  backup, data portability, interoperability.
+site_url: https://ns81000.github.io/jiocloud_client/
+repo_url: https://github.com/Ns81000/jiocloud_client
+repo_name: Ns81000/jiocloud_client
+copyright: >
+  Unofficial project. Not affiliated with Reliance Jio Infocomm Ltd.
+  "Jio" / "Jio AI Cloud" are trademarks of their respective owners.
+
+theme:
+  name: material
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - navigation.footer
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.highlight
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+
+nav:
+  - Home: index.md
+  - Getting Started:
+      - Getting Credentials: GET_CREDENTIALS.md
+      - Authentication: AUTHENTICATION.md
+  - Reference:
+      - API Reference: API_REFERENCE.md
+      - Data Models: DATA_MODELS.md
+      - Error Codes: ERROR_CODES.md
+      - Known Issues: KNOWN_ISSUES.md
+  - Legal:
+      - Disclaimer: DISCLAIMER.md
+      - Legal Notes: LEGAL.md
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/Ns81000/jiocloud_client

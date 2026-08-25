@@ -104,7 +104,7 @@ item's current server state. Missing fields cause silent rejection into
 | `sourceName` | `NMSOM0021` Source name is null or empty |
 
 For `TRASH`, the payload's `"status"` must be pre-set to `"T"` (see
-KNOWN_ISSUES.md ISSUE-001). The SDK resolves current state via
+KNOWN_ISSUES.md (docs/KNOWN_ISSUES.md, ISSUE-001). The SDK resolves current state via
 `_resolve_objects()` before mutating.
 
 SDK: `rename_object()`, `move_object()`, `set_favorite()`, `delete_to_trash()`

@@ -5,7 +5,7 @@ Demonstrates creating cloud folders, renaming, favoriting, listing trash,
 moving items to trash, and restoring.
 
 UNOFFICIAL PROJECT — personal backup / data-portability use only.
-Not affiliated with Reliance Jio Infocomm Ltd. See DISCLAIMER.md.
+Not affiliated with Reliance Jio Infocomm Ltd. See docs/DISCLAIMER.md.
 """
 
 import sys
@@ -50,7 +50,7 @@ def main():
         # 5. Move to trash
         res = client.delete_to_trash(folder.object_key)
         if res.get("unprocessed"):
-            raise RuntimeError("trash rejected — see KNOWN_ISSUES.md")
+            raise RuntimeError("trash rejected — see docs/KNOWN_ISSUES.md")
         print("5. Moved to trash; waiting for trash listing to update…")
         deadline = time.time() + 90
         while time.time() < deadline:
