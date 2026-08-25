@@ -40,20 +40,22 @@ you copy, then run one command.
 into the filter box at the top of the Network tab:
 
 ```
-domain:api.jioaicloud.com security/users
+domain:api.jioaicloud.com security/users -method:OPTIONS
 ```
 
-That isolates the profile endpoint directly. Broader options:
+That isolates the profile endpoint directly **and hides CORS preflights**
+(the `OPTIONS` entries carry no credentials — copying one of those is the
+most common mistake). Broader options:
 
 | Filter | Shows |
 |---|---|
 | `domain:jioaicloud.com` | every Jio AI Cloud API call (all subdomains) |
-| `domain:api.jioaicloud.com` | account-level API calls only |
-| `domain:api.jioaicloud.com security/users` | just the profile endpoint — ideal for step 2 |
+| `domain:jioaicloud.com -method:OPTIONS` | same, preflights hidden — safest general choice |
+| `domain:api.jioaicloud.com security/users -method:OPTIONS` | just the profile GET — ideal for step 2 |
 
-**Step 2 — copy it:** right-click any request in the filtered list →
-**Copy → Copy as cURL** (`bash` or `CMD` variant both work; the parser
-handles Chrome's caret-escaped Windows output).
+**Step 2 — copy it:** click the request whose Method column shows **GET**
+(not OPTIONS), then right-click → **Copy → Copy as cURL** (`bash` or `CMD`
+variant both work; the parser handles Chrome's caret-escaped Windows output).
 
 **Step 3 — run the helper** (it reads the cURL straight from your clipboard):
 

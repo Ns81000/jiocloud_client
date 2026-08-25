@@ -114,7 +114,7 @@ jiocloud_client/
 ### 1. Configuration
 
 The easiest path: copy one request as cURL from your browser's Network tab
-(filter: `domain:api.jioaicloud.com security/users`), then run:
+(filter: `domain:api.jioaicloud.com security/users -method:OPTIONS`), then run:
 
 ```bash
 python examples/setup_credentials.py --from-curl

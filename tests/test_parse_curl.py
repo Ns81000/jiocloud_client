@@ -66,4 +66,15 @@ print("plain double-quote one-liner -> OK")
 assert parse_curl("curl 'https://example.com'") == {}
 print("no headers -> {} OK")
 
+# 5. CORS preflight (OPTIONS) copy — must yield {} so the helper can
+#    detect the mistake and guide the user to the GET request.
+preflight = '''curl ^"https://api.jioaicloud.com/security/users^" ^
+  -X ^"OPTIONS^" ^
+  -H ^"Accept: */*^" ^
+  -H ^"Access-Control-Request-Headers: authorization,content-type,x-api-key,x-app-secret,x-client-details,x-device-key,x-device-type,x-user-id^" ^
+  -H ^"Access-Control-Request-Method: GET^" ^
+  -H ^"Origin: https://www.jioaicloud.com^"'''
+assert parse_curl(preflight) == {}, parse_curl(preflight)
+print("CORS preflight (OPTIONS) -> {} OK")
+
 print("ALL parse_curl TESTS PASS")

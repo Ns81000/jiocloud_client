@@ -62,11 +62,11 @@ def _read_clipboard() -> str:
 
 
 def parse_curl(raw: str) -> dict:
-    """Extract auth_token / user_id / device_key from a 'Copy as cURL' command.
+    r"""Extract auth_token / user_id / device_key from a 'Copy as cURL' command.
 
     Handles every dialect Chrome produces:
       - POSIX bash copy  (single quotes, backslash-newline continuations,
-        $'\\r' carriage returns)
+        $'\r' carriage returns)
       - Windows CMD copy (caret ^ escapes, ^"quoted^" arguments, ^\^"
         nested quotes)
     Header matching is case-insensitive. Never prints the values.
@@ -214,10 +214,30 @@ def main() -> None:
         vals = parse_curl(raw)
         missing = [k for k in ("auth_token", "user_id", "device_key") if not vals.get(k)]
         if missing:
-            print(f"\nERROR: could not find header(s) {missing} in the {src} "
-                  "content.", file=sys.stderr)
-            print("Make sure you right-clicked a request TO a *.jioaicloud.com "
-                  "URL in DevTools -> Copy -> Copy as cURL.", file=sys.stderr)
+            # Distinguish the most common mistake: copying the CORS preflight
+            # (OPTIONS) request, which never carries credential headers.
+            flat = raw.replace("^", "")
+            if ("-X OPTIONS" in flat or "'OPTIONS'" in flat or '"OPTIONS"' in flat
+                    or "Access-Control-Request-Headers" in flat):
+                print("\nThat is the CORS PREFLIGHT (OPTIONS) request - it never "
+                      "carries credentials.", file=sys.stderr)
+                print("In DevTools, look for the SAME URL with method GET (or POST):",
+                      file=sys.stderr)
+                print("  1. In the Network tab filter box, add  -method:OPTIONS  "
+                      "to hide preflights:", file=sys.stderr)
+                print("       domain:api.jioaicloud.com security/users -method:OPTIONS",
+                      file=sys.stderr)
+                print("  2. Click the GET request (Name column shows 'users'), "
+                      "right-click -> Copy -> Copy as cURL.", file=sys.stderr)
+                print("  3. Run this command again.", file=sys.stderr)
+            else:
+                print(f"\nERROR: could not find header(s) {missing} in the {src} "
+                      "content.", file=sys.stderr)
+                print("Make sure you right-clicked a request TO a *.jioaicloud.com "
+                      "URL in DevTools -> Copy -> Copy as cURL.", file=sys.stderr)
+                print("Tip: filter the Network tab with:  "
+                      "domain:api.jioaicloud.com security/users -method:OPTIONS",
+                      file=sys.stderr)
             sys.exit(4)
         auth_token = f"Basic {vals['auth_token'].removeprefix('Basic ').strip()}"
         user_id, device_key = vals["user_id"], vals["device_key"]

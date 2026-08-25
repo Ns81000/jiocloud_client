@@ -44,8 +44,9 @@ ERROR HANDLING
 Every failure returns {"ok": false, "error": {"type": ..., "message": ...}}.
 - AuthenticationError / HTTP 401 TEJGA0401: session token revoked (web logout).
   Stop and ask the user to re-extract credentials: Network tab filter
-  "domain:api.jioaicloud.com security/users", right-click -> Copy as cURL,
-  then "python examples/setup_credentials.py --from-curl" (reads clipboard).
+  "domain:api.jioaicloud.com security/users -method:OPTIONS", click the GET
+  request (NOT the OPTIONS preflight), right-click -> Copy as cURL, then
+  "python examples/setup_credentials.py --from-curl" (reads clipboard).
   Do not retry.
 - RateLimitError (429) and ServerError (5xx): the SDK already retries with
   exponential backoff; do not hammer retries yourself.

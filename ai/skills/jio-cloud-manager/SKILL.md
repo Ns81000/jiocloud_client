@@ -31,8 +31,10 @@ Extraction instructions for the user live at
 Recommended flow (tell the user, never handle the raw token yourself):
 
 1. User opens DevTools Network tab with filter
-   `domain:api.jioaicloud.com security/users`.
-2. User right-clicks the request -> Copy -> Copy as cURL.
+   `domain:api.jioaicloud.com security/users -method:OPTIONS` (hides CORS
+   preflights, which carry no credentials).
+2. User clicks the GET request (Method column), right-clicks -> Copy ->
+   Copy as cURL.
 3. User runs `python examples/setup_credentials.py --from-curl`, which reads
    the clipboard, validates live against `GET /security/users`, and writes
    local `config.json`.
