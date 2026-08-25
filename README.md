@@ -7,6 +7,7 @@
 ![GitHub issues](https://img.shields.io/github/issues/Ns81000/jiocloud_client)
 [![Docs](https://img.shields.io/badge/docs-GitHub%20Pages-informational)](https://ns81000.github.io/jiocloud_client/)
 ![Live verified](https://img.shields.io/badge/live--verified-2026--08--25-orange)
+[![Docs deploy](https://github.com/Ns81000/jiocloud_client/actions/workflows/deploy-docs.yml/badge.svg?branch=main)](https://github.com/Ns81000/jiocloud_client/actions/workflows/deploy-docs.yml)
 
 > **UNOFFICIAL PROJECT.** Not affiliated with, associated with, authorized
 > by, endorsed by, or in any way officially connected with Reliance Jio
