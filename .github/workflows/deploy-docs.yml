@@ -7,6 +7,8 @@ on:
       - "docs/**"
       - "mkdocs.yml"
       - ".github/workflows/deploy-docs.yml"
+      - "llms.txt"
+      - "llms-full.txt"
   workflow_dispatch:
 
 permissions:
@@ -36,4 +38,6 @@ jobs:
           ls -la site/llms*.txt
 
       - name: Deploy to GitHub Pages
-        run: mkdocs gh-deploy --force --no-history
+        # Deploy the PRE-BUILT site dir (--no-build) so the copied
+        # llms.txt / llms-full.txt are included in the push.
+        run: mkdocs gh-deploy --force --no-history --no-build --site-dir site
