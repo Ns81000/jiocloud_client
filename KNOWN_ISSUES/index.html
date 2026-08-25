@@ -1,0 +1,1356 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Unofficial Jio AI Cloud Python SDK, CLI & AI-agent tool server — personal backup, data portability, interoperability.">
+      
+      
+      
+        <link rel="canonical" href="https://ns81000.github.io/jiocloud_client/KNOWN_ISSUES/">
+      
+      
+        <link rel="prev" href="../ERROR_CODES/">
+      
+      
+        <link rel="next" href="../DISCLAIMER/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Known Issues - jiocloud-client</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#known-issues-server-behavior-notes" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="jiocloud-client" class="md-header__button md-logo" aria-label="jiocloud-client" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            jiocloud-client
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Known Issues
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/Ns81000/jiocloud_client" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    Ns81000/jiocloud_client
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../GET_CREDENTIALS/" class="md-tabs__link">
+          
+  
+  
+  Getting Started
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../API_REFERENCE/" class="md-tabs__link">
+          
+  
+  
+  Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../DISCLAIMER/" class="md-tabs__link">
+          
+  
+  
+  Legal
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="jiocloud-client" class="md-nav__button md-logo" aria-label="jiocloud-client" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    jiocloud-client
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/Ns81000/jiocloud_client" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    Ns81000/jiocloud_client
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Getting Started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../GET_CREDENTIALS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Credentials
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../AUTHENTICATION/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Authentication
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../API_REFERENCE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../DATA_MODELS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Data Models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ERROR_CODES/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Error Codes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Known Issues
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Known Issues
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#issue-001-resolved-move-to-trash-requires-trash-op-statust" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ISSUE-001 (RESOLVED): Move-to-trash requires TRASH op + status:"T"
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#issue-002-resolved-restore-from-trash-verified" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ISSUE-002 (RESOLVED): Restore-from-trash verified
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#caveats-issue-003-type-query-param-only-accepts-f-or-w" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CAVEATS: ISSUE-003: type query param only accepts f or w
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#caveats-issue-004-batch-mutations-require-the-full-object-echo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CAVEATS: ISSUE-004: Batch mutations require the FULL object echo
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#caveats-issue-005-contacts-service-requires-undocumented-headersparams" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CAVEATS: ISSUE-005: Contacts service requires undocumented headers/params
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#caveats-issue-006-content-type-mandatory-on-bodiless-gets" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CAVEATS: ISSUE-006: Content-Type mandatory on bodiless GETs
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#caveats-issue-007-trashlisting-eventual-consistency-2s" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CAVEATS: ISSUE-007: Trash/listing eventual consistency (~2s)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#not-implemented-endpoints-exist-in-captures-but-lack-verified-contracts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Not implemented (endpoints exist in captures but lack verified contracts)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#caveats-issue-008-token-identity-segment-can-differ-from-x-user-id-after-re-login" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CAVEATS: ISSUE-008: Token identity segment can differ from X-User-Id after re-login
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#verification-environment" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verification environment
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Legal
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Legal
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../DISCLAIMER/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Disclaimer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../LEGAL/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Legal Notes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#issue-001-resolved-move-to-trash-requires-trash-op-statust" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ISSUE-001 (RESOLVED): Move-to-trash requires TRASH op + status:"T"
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#issue-002-resolved-restore-from-trash-verified" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ISSUE-002 (RESOLVED): Restore-from-trash verified
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#caveats-issue-003-type-query-param-only-accepts-f-or-w" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CAVEATS: ISSUE-003: type query param only accepts f or w
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#caveats-issue-004-batch-mutations-require-the-full-object-echo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CAVEATS: ISSUE-004: Batch mutations require the FULL object echo
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#caveats-issue-005-contacts-service-requires-undocumented-headersparams" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CAVEATS: ISSUE-005: Contacts service requires undocumented headers/params
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#caveats-issue-006-content-type-mandatory-on-bodiless-gets" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CAVEATS: ISSUE-006: Content-Type mandatory on bodiless GETs
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#caveats-issue-007-trashlisting-eventual-consistency-2s" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CAVEATS: ISSUE-007: Trash/listing eventual consistency (~2s)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#not-implemented-endpoints-exist-in-captures-but-lack-verified-contracts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Not implemented (endpoints exist in captures but lack verified contracts)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#caveats-issue-008-token-identity-segment-can-differ-from-x-user-id-after-re-login" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CAVEATS: ISSUE-008: Token identity segment can differ from X-User-Id after re-login
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#verification-environment" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verification environment
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="known-issues-server-behavior-notes">KNOWN ISSUES &amp; SERVER BEHAVIOR NOTES<a class="headerlink" href="#known-issues-server-behavior-notes" title="Permanent link">&para;</a></h1>
+<blockquote>
+<p><strong>UNSTABLE TARGET — Last verified: 2026-08-25 (26/26 checks passed).</strong>
+Jio AI Cloud has no public API. Endpoints change without notice and can
+break at any time. Features may stop working at any moment — check
+<a href="./">KNOWN_ISSUES.md</a> for current status.</p>
+</blockquote>
+<p>This project practices <strong>radical honesty</strong>: everything below was discovered by
+live testing against production Jio AI Cloud servers (2026-08-25) and is
+documented so contributors know exactly where the gaps are.
+<strong>Anyone can contribute a fix</strong> — see "How to help" under each issue.</p>
+<p>Status legend: VERIFIED (working) · CAVEATS (works with caveats) · BROKEN (server-rejected)</p>
+<hr />
+<h2 id="issue-001-resolved-move-to-trash-requires-trash-op-statust">ISSUE-001 (RESOLVED): Move-to-trash requires <code>TRASH</code> op + <code>status:"T"</code><a class="headerlink" href="#issue-001-resolved-move-to-trash-requires-trash-op-statust" title="Permanent link">&para;</a></h2>
+<p><strong>History</strong>
+The original traffic capture (2026-08-24 19:20) showed deletes working via:</p>
+<div class="highlight"><pre><span></span><code>PUT /nms/metadata/delete   body: {"objectKeys": ["&lt;key&gt;"]}
+</code></pre></div>
+<p>By the time of live verification (2026-08-25), that endpoint <strong>silently
+rejected every key</strong> — HTTP 200 but the op landed in an empty-detail
+<code>unprocessed[]</code> array, for new folders and old files alike, regardless of
+headers or payload shape.</p>
+<p><strong>Resolution:</strong> a second capture (2026-08-24 21:16, contributed by the
+project owner) revealed the web client had switched to:</p>
+<div class="highlight"><pre><span></span><code>PUT /nms/metadata/1.0
+body: {"objects": [{"operation": "TRASH",
+                    "correlationId": "&lt;userId&gt;",
+                    "object": { ...FULL object echo..., "status": "T" }}]}
+</code></pre></div>
+<p>The decisive detail was <code>"status": "T"</code> pre-set in the request object.
+With the full echo plus <code>status:"T"</code>, items land in trash within seconds;
+<code>restore_from_trash</code> (<code>PUT /nms/metadata/restore</code>, unchanged contract) then
+verifiably restores them. The full create→rename→favorite→trash→restore→trash
+cycle now passes in <code>tests/live_verify.py</code>.</p>
+<p><strong>Lesson for contributors</strong>: Jio's web client evolves its contracts without
+notice; when an endpoint starts failing, capture fresh traffic before
+assuming breakage. The SDK's <code>_metadata_op()</code> also surfaces per-object
+errors from <code>unprocessed[].object.errorMessage / errorCode</code> as typed
+exceptions instead of pretending success.</p>
+<hr />
+<h2 id="issue-002-resolved-restore-from-trash-verified">ISSUE-002 (RESOLVED): Restore-from-trash verified<a class="headerlink" href="#issue-002-resolved-restore-from-trash-verified" title="Permanent link">&para;</a></h2>
+<p>Depends on ISSUE-001's flow. Verified end-to-end: trash → visible in
+<code>GET /nms/trash</code> → restore → gone from trash → re-trash → lands again.</p>
+<hr />
+<h2 id="caveats-issue-003-type-query-param-only-accepts-f-or-w">CAVEATS: ISSUE-003: <code>type</code> query param only accepts <code>f</code> or <code>w</code><a class="headerlink" href="#caveats-issue-003-type-query-param-only-accepts-f-or-w" title="Permanent link">&para;</a></h2>
+<p><code>GET /nms/metadata*?type=…</code> rejects anything except <code>f</code> (files) / <code>w</code>
+(folders) with <code>400 NMSOM0129</code>. There is <strong>no "list everything at once"</strong>
+mode, so recursive walks issue two queries per directory. Handled internally
+by <code>stream_all_files()</code>.</p>
+<hr />
+<h2 id="caveats-issue-004-batch-mutations-require-the-full-object-echo">CAVEATS: ISSUE-004: Batch mutations require the FULL object echo<a class="headerlink" href="#caveats-issue-004-batch-mutations-require-the-full-object-echo" title="Permanent link">&para;</a></h2>
+<p><code>PUT /nms/metadata/1.0</code> operations (<code>SETFAV</code>, <code>UNSETFAV</code>, <code>RENAME</code>, <code>MOVE</code>,
+<code>TRASH</code>) fail constraint validation unless the object patch carries fields
+like <code>objectName</code> / <code>sourceName</code>:</p>
+<ul>
+<li>missing <code>objectName</code> → <code>TEJVF0001</code></li>
+<li>missing <code>sourceName</code> → <code>NMSOM0021 "Source name is null or empty"</code></li>
+</ul>
+<p>The SDK handles this by resolving current server state before mutating.
+Failure detail is returned inside <code>unprocessed[].object.errorMessage /
+errorCode</code>; <code>_metadata_op()</code> raises <code>InvalidRequestError</code> with that code.</p>
+<hr />
+<h2 id="caveats-issue-005-contacts-service-requires-undocumented-headersparams">CAVEATS: ISSUE-005: Contacts service requires undocumented headers/params<a class="headerlink" href="#caveats-issue-005-contacts-service-requires-undocumented-headersparams" title="Permanent link">&para;</a></h2>
+<p><code>GET /amiko/cab/contacts</code> fails without BOTH:
+- <code>X-Offset: &lt;n&gt;</code> request header (error <code>TEJRF0400</code>)
+- <code>nextPageDate=yyyy-MM-dd HH:mm:ss.SSSSSS</code> query param (same error)</p>
+<p><code>get_contacts()</code> sends both defaults; paging uses <code>X-CHUNK-SIZE</code>.
+Accounts with zero contacts return <code>{}</code> — behavior with many contacts is
+inferred from the pagination contract, not yet observed live. <strong>Contributor
+with a populated address book: please verify page-walk works end-to-end.</strong></p>
+<hr />
+<h2 id="caveats-issue-006-content-type-mandatory-on-bodiless-gets">CAVEATS: ISSUE-006: Content-Type mandatory on bodiless GETs<a class="headerlink" href="#caveats-issue-006-content-type-mandatory-on-bodiless-gets" title="Permanent link">&para;</a></h2>
+<p>All Jio endpoints reject GETs without a <code>Content-Type</code> header
+(<code>NMSOM0003</code>, <code>BRSOM0036</code>). The SDK always sends it. Keep this in mind when
+adding new endpoints.</p>
+<hr />
+<h2 id="caveats-issue-007-trashlisting-eventual-consistency-2s">CAVEATS: ISSUE-007: Trash/listing eventual consistency (~2s)<a class="headerlink" href="#caveats-issue-007-trashlisting-eventual-consistency-2s" title="Permanent link">&para;</a></h2>
+<p>Newly created items may take a second or two to appear in listings;
+mutations can lag similarly. Tests use short settle delays. If you see flaky
+results in scripts, add small sleeps between mutate→list sequences.</p>
+<hr />
+<h2 id="not-implemented-endpoints-exist-in-captures-but-lack-verified-contracts">Not implemented (endpoints exist in captures but lack verified contracts)<a class="headerlink" href="#not-implemented-endpoints-exist-in-captures-but-lack-verified-contracts" title="Permanent link">&para;</a></h2>
+<p>These appeared only as CORS preflights or were not exercised live; payloads
+are unknown, so we deliberately did NOT guess them:</p>
+<ul>
+<li>Upload (the web app uploads via a different authenticated flow we have not
+  captured yet)</li>
+<li>Board file add/remove, board edit/delete, board invite flows</li>
+<li>Folder copy/duplicate operations</li>
+<li>Manual tag create/delete (<code>GET</code> variants are implemented &amp; verified)</li>
+<li>Permanent (non-trash) deletion</li>
+</ul>
+<p><strong>Contributors welcome</strong>: capture the traffic for any of these from the web
+UI and open an issue with the (redacted) request shape.</p>
+<p>Each of these gaps is tracked as a GitHub issue with detailed acceptance
+criteria — see the issue tracker for current status:
+upload (#2), board write flows (#3), permanent deletion (#4), manual tag
+mutations (#7), folder copy (#8).</p>
+<hr />
+<h2 id="caveats-issue-008-token-identity-segment-can-differ-from-x-user-id-after-re-login">CAVEATS: ISSUE-008: Token identity segment can differ from <code>X-User-Id</code> after re-login<a class="headerlink" href="#caveats-issue-008-token-identity-segment-can-differ-from-x-user-id-after-re-login" title="Permanent link">&para;</a></h2>
+<blockquote>
+<p>Tracker note: resolved protocol quirks are also archived as closed issues
+(#9-#16) with full discovery/resolution narratives; open capability gaps
+are tracked in #1-#8.</p>
+</blockquote>
+<p>Discovered 2026-08-25 during credential-rotation testing
+(<code>examples/setup_credentials.py</code>).</p>
+<p>The Basic token decodes best-effort to <code>&lt;id&gt;#ATK#&lt;payload&gt;</code> (see
+<code>JioCloudAuth.peek_token_identity()</code>). On the original capture, <code>&lt;id&gt;</code>
+matched the <code>X-User-Id</code> header exactly. After logging out and back in,
+the freshly captured token decodes to a <strong>different</strong> id (<code>96ef07b0...</code>)
+while the browser keeps sending the same <code>X-User-Id</code> (<code>bbaac1b8...</code>) —
+and the server <strong>accepts the pair</strong> (<code>GET /security/users</code> → 200 with the
+correct profile).</p>
+<p>Implications:</p>
+<ul>
+<li>The token's embedded id is evidently NOT always the account user id
+  (possibly a per-session or per-device identifier). Do not rely on it.</li>
+<li><code>peek_token_identity()</code> mismatches are <strong>advisory only</strong>;
+  <code>setup_credentials.py</code> warns but proceeds, which is correct behavior.</li>
+<li>Live verification (26/26 on 2026-08-25) ran under the OLD pairing; the
+  NEW pairing also validates. Contributor idea: probe whether the same
+  token works with a <em>wrong</em> X-User-Id to map how strictly the server
+  binds these values.</li>
+</ul>
+<p><strong>How to help:</strong> if you rotate sessions, run <code>python tests/live_verify.py</code>
+afterwards and report whether all checks pass under the new pairing.</p>
+<hr />
+<h2 id="verification-environment">Verification environment<a class="headerlink" href="#verification-environment" title="Permanent link">&para;</a></h2>
+<p>Findings above reproduced 2026-08-25 against production with a free-tier
+account (~39 GB used of 100 GB), Chrome 147 web-client header profile.
+Run <code>python tests/live_verify.py</code> yourself to reproduce the matrix locally.</p>
+<blockquote>
+<p><strong>Note on token expiry:</strong> session tokens are revocable and expire when the
+web session is logged out or refreshed. A run against an expired token
+shows every check failing with <code>AuthenticationError: 401 TEJGA0401</code> — that
+is the SDK working correctly (typed errors, no silent retries). Refresh
+<code>config.json</code> per <a href="../AUTHENTICATION/">AUTHENTICATION.md</a>, section 2, and re-run.</p>
+</blockquote>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../ERROR_CODES/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Error Codes">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Error Codes
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../DISCLAIMER/" class="md-footer__link md-footer__link--next" aria-label="Next: Disclaimer">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Disclaimer
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Unofficial project. Not affiliated with Reliance Jio Infocomm Ltd. "Jio" / "Jio AI Cloud" are trademarks of their respective owners.
+
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/Ns81000/jiocloud_client" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>
