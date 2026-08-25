@@ -33,26 +33,47 @@ The three values:
 
 This reads straight out of the Network tab, so it works no matter how the app
 makes its requests — no script injection, nothing that a page reload or an
-iframe can break.
+iframe can break. On Windows the helper reads the clipboard automatically:
+you copy, then run one command.
 
-1. Log in at <https://www.jioaicloud.com>.
-2. Press **F12** → open the **Network** tab.
-3. Click around inside the app (open *My Files*) until requests appear, then
-   click any request whose URL contains `jioaicloud.com`.
-4. Right-click it → **Copy → Copy as cURL** (`bash` variant is fine).
-5. Run:
+**Step 1 — filter the Network tab** so you only see what matters. Type this
+into the filter box at the top of the Network tab:
+
+```
+domain:api.jioaicloud.com security/users
+```
+
+That isolates the profile endpoint directly. Broader options:
+
+| Filter | Shows |
+|---|---|
+| `domain:jioaicloud.com` | every Jio AI Cloud API call (all subdomains) |
+| `domain:api.jioaicloud.com` | account-level API calls only |
+| `domain:api.jioaicloud.com security/users` | just the profile endpoint — ideal for step 2 |
+
+**Step 2 — copy it:** right-click any request in the filtered list →
+**Copy → Copy as cURL** (`bash` or `CMD` variant both work; the parser
+handles Chrome's caret-escaped Windows output).
+
+**Step 3 — run the helper** (it reads the cURL straight from your clipboard):
 
 ```bash
 python examples/setup_credentials.py --from-curl
 ```
 
-and paste the copied cURL command at the prompt (or save it to a file first:
-`python examples/setup_credentials.py --from-curl --curl-file curl.txt`).
-
-The helper extracts `Authorization`, `X-User-Id`, and `X-Device-Key`
-automatically (handles both the POSIX and Windows CMD cURL formats), calls
-`GET /security/users` to verify the session live, prints your profile
+That's it. It extracts `Authorization`, `X-User-Id`, and `X-Device-Key`,
+calls `GET /security/users` to verify the session live, prints your profile
 name/email on success, and writes `config.json`.
+
+Alternatives if the clipboard route is unavailable:
+
+```bash
+# save the copied command to a file first
+python examples/setup_credentials.py --from-curl --curl-file curl.txt
+
+# paste manually instead of clipboard (finish with Ctrl+Z then Enter on Windows)
+python examples/setup_credentials.py --from-curl --paste
+```
 
 > **Security:** the cURL command contains your full token. Paste it only into
 > this local helper, never into chats, issues, screenshots, or any website.

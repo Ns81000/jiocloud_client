@@ -27,11 +27,19 @@ variables) containing the user's OWN session values:
 - `device_key` — the `X-Device-Key` header (UUID)
 
 Extraction instructions for the user live at
-[docs/GET_CREDENTIALS.md](https://github.com/Ns81000/jiocloud_client/blob/main/docs/GET_CREDENTIALS.md)
-(interactive validator: `python examples/setup_credentials.py`; verification:
-`python cli.py info`). Session tokens are revoked when the user logs out of
-the web app (`401 TEJGA0401`) — if every call fails that way, ask the user to
-re-extract credentials rather than retrying.
+[docs/GET_CREDENTIALS.md](https://github.com/Ns81000/jiocloud_client/blob/main/docs/GET_CREDENTIALS.md).
+Recommended flow (tell the user, never handle the raw token yourself):
+
+1. User opens DevTools Network tab with filter
+   `domain:api.jioaicloud.com security/users`.
+2. User right-clicks the request -> Copy -> Copy as cURL.
+3. User runs `python examples/setup_credentials.py --from-curl`, which reads
+   the clipboard, validates live against `GET /security/users`, and writes
+   local `config.json`.
+
+Verification: `python cli.py info`. Session tokens are revoked when the user
+logs out of the web app (`401 TEJGA0401`) — if every call fails that way, ask
+the user to re-extract credentials rather than retrying.
 
 Rules:
 

@@ -113,16 +113,16 @@ jiocloud_client/
 
 ### 1. Configuration
 
-The easiest path: run the interactive validator, which walks you through
-extracting credentials from your own browser session, validates them live,
-and writes `config.json`:
+The easiest path: copy one request as cURL from your browser's Network tab
+(filter: `domain:api.jioaicloud.com security/users`), then run:
 
 ```bash
-python examples/setup_credentials.py
+python examples/setup_credentials.py --from-curl
 ```
 
-Full walkthrough (including a one-paste browser console extractor):
-**[docs/GET_CREDENTIALS.md](docs/GET_CREDENTIALS.md)**.
+It reads the cURL from your clipboard, validates the session live, and writes
+`config.json`. Full walkthrough (including a one-paste browser console
+extractor): **[docs/GET_CREDENTIALS.md](docs/GET_CREDENTIALS.md)**.
 
 Manual alternative: copy `config.example.json` to `config.json` and fill in
 **your own** session credentials:

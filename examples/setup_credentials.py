@@ -22,6 +22,7 @@ import argparse
 import json
 import os
 import re
+import subprocess
 import sys
 from pathlib import Path
 
@@ -34,28 +35,62 @@ from jiocloud.auth import JioCloudAuth  # noqa: E402
 VALIDATE_URL = "https://api.jioaicloud.com/security/users"
 
 
-def parse_curl(raw: str) -> dict:
-    """Extract auth_token / user_id / device_key from a 'Copy as cURL' string.
+def _read_clipboard() -> str:
+    """Return current clipboard text (Windows/macOS/Linux best effort)."""
+    try:
+        import tkinter
+        root = tkinter.Tk()
+        root.withdraw()
+        text = root.clipboard_get()
+        root.destroy()
+        return text
+    except Exception:
+        pass
+    if os.name == "nt":
+        try:
+            out = subprocess.run(
+                ["powershell", "-NoProfile", "-Command", "Get-Clipboard"],
+                capture_output=True, text=True, timeout=15)
+            return out.stdout
+        except Exception:
+            return ""
+    try:
+        out = subprocess.run(["pbpaste"], capture_output=True, text=True, timeout=10)
+        return out.stdout
+    except Exception:
+        return ""
 
-    Handles both POSIX ($'...' with \r) and Windows CMD (^-continuation)
-    variants Chrome produces, single or double quotes, and header names in
-    any case. Never prints the values.
+
+def parse_curl(raw: str) -> dict:
+    """Extract auth_token / user_id / device_key from a 'Copy as cURL' command.
+
+    Handles every dialect Chrome produces:
+      - POSIX bash copy  (single quotes, backslash-newline continuations,
+        $'\\r' carriage returns)
+      - Windows CMD copy (caret ^ escapes, ^"quoted^" arguments, ^\^"
+        nested quotes)
+    Header matching is case-insensitive. Never prints the values.
     """
-    # Join continuation lines so regexes see one long string.
-    s = raw.replace("\\\r\n", " ").replace("\\\n", " ").replace("^\r\n", " ").replace("^\n", " ")
-    s = s.replace("$'\\r'", "").replace("'\\r'", "")
+    # Normalize CMD caret escaping FIRST (^" -> ", ^\^" -> "), then join
+    # continuation lines of both dialects and strip bash $'...\r' artifacts
+    # so regexes see one long plain string.
+    s = raw.replace("^", "")
+    s = s.replace("\\\r\n", " ").replace("\\\n", " ")
+    s = s.replace("\\r'", "'")
 
     out = {}
-    for m in re.finditer(r"-H\s*['\"]([^'\"]+)['\"]", s):
-        hdr = m.group(1)
+    # Match -H 'header' or -H "header"; the optional $ covers bash's $'...'
+    # quoting. Values may contain inner doubled quotes after sanitization.
+    for m in re.finditer(r"-H\s+\$?(['\"])(.+?)\1(?=\s|$|-)", s):
+        hdr = m.group(2)
         name, _, value = hdr.partition(":")
         lk = name.strip().lower()
         if lk == "authorization":
-            out["auth_token"] = value.strip()
+            out["auth_token"] = value.strip().strip("'\"").strip()
         elif lk == "x-user-id":
-            out["user_id"] = value.strip()
+            out["user_id"] = value.strip().strip("'\"").strip()
         elif lk == "x-device-key":
-            out["device_key"] = value.strip()
+            out["device_key"] = value.strip().strip("'\"").strip()
     return out
 
 
@@ -149,11 +184,14 @@ def main() -> None:
                         help="print the one-paste browser console extractor "
                              "(same as examples/browser_console_extractor.js)")
     parser.add_argument("--from-curl", action="store_true",
-                        help="read a 'Copy as cURL' command from stdin (or a "
-                             "file path passed after --curl-file) and extract "
-                             "the three credential headers from it")
+                        help="extract the three credential headers from a "
+                             "'Copy as cURL' command currently on the "
+                             "clipboard (or paste it when prompted)")
     parser.add_argument("--curl-file", default=None,
                         help="file containing the copied cURL command")
+    parser.add_argument("--paste", action="store_true",
+                        help="with --from-curl: paste the cURL text instead "
+                             "of reading the clipboard")
     args = parser.parse_args()
 
     if args.show_extractor:
@@ -164,16 +202,22 @@ def main() -> None:
     if args.from_curl:
         if args.curl_file:
             raw = Path(args.curl_file).read_text(encoding="utf-8")
+            src = f"file {args.curl_file}"
+        elif not args.paste and sys.stdin.isatty():
+            raw = _read_clipboard()
+            src = "clipboard"
         else:
-            print("Paste the 'Copy as cURL' output (right-click the request in")
-            print("DevTools Network tab -> Copy -> Copy as cURL), then press Enter:")
+            print("Paste the 'Copy as cURL' command, then press Enter "
+                  "(Ctrl+Z, Enter to finish on Windows):")
             raw = sys.stdin.read()
+            src = "pasted input"
         vals = parse_curl(raw)
         missing = [k for k in ("auth_token", "user_id", "device_key") if not vals.get(k)]
         if missing:
-            print(f"\nERROR: could not find header(s) {missing} in the pasted "
-                  "command. Make sure you copied a request TO a "
-                  "*.jioaicloud.com URL.", file=sys.stderr)
+            print(f"\nERROR: could not find header(s) {missing} in the {src} "
+                  "content.", file=sys.stderr)
+            print("Make sure you right-clicked a request TO a *.jioaicloud.com "
+                  "URL in DevTools -> Copy -> Copy as cURL.", file=sys.stderr)
             sys.exit(4)
         auth_token = f"Basic {vals['auth_token'].removeprefix('Basic ').strip()}"
         user_id, device_key = vals["user_id"], vals["device_key"]
