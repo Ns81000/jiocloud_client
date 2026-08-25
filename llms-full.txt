@@ -11,7 +11,6 @@
 > "Jio" / "Jio AI Cloud" are trademarks of their respective owners.
 
 
-
 ---
 
 # PAGE: Getting Credentials (docs/GET_CREDENTIALS.md)
@@ -203,6 +202,11 @@ You should see your account name and quota breakdown.
 
 # Authentication & Security
 
+> **UNSTABLE TARGET — Last verified: 2026-08-25 (26/26 checks passed).**
+> Jio AI Cloud has no public API. Endpoints change without notice and can
+> break at any time. Features may stop working at any moment — check
+> [KNOWN_ISSUES.md](KNOWN_ISSUES.md) for current status.
+
 ## 1. Header Contract (verified against production)
 
 Every request — **including bodiless GETs** — must carry:
@@ -277,6 +281,11 @@ with the server's code attached.
 # PAGE: API Reference (docs/API_REFERENCE.md)
 
 # API Reference — Unofficial Jio AI Cloud SDK
+
+> **UNSTABLE TARGET — Last verified: 2026-08-25 (26/26 checks passed).**
+> Jio AI Cloud has no public API. Endpoints change without notice and can
+> break at any time. Features may stop working at any moment — check
+> [KNOWN_ISSUES.md](KNOWN_ISSUES.md) for current status.
 
 All endpoints below were **verified against live production servers**
 (2026-08-25). Base URLs and the exact request/response shapes are documented;
@@ -391,9 +400,9 @@ SDK: `rename_object()`, `move_object()`, `set_favorite()`, `delete_to_trash()`
 
 | Method | Path | Body | Status |
 |---|---|---|---|
-| PUT | `/nms/metadata/restore` | `{"objectKeys": ["<key>", …]}` | ✅ verified |
-| GET | `/nms/trash?limit=&sort=` | — | ✅ verified |
-| ~~PUT~~ | ~~`/nms/metadata/delete`~~ | legacy delete — now silently rejects all keys | ❌ deprecated server-side |
+| PUT | `/nms/metadata/restore` | `{"objectKeys": ["<key>", …]}` |  verified |
+| GET | `/nms/trash?limit=&sort=` | — |  verified |
+| ~~PUT~~ | ~~`/nms/metadata/delete`~~ | legacy delete — now silently rejects all keys |  deprecated server-side |
 
 SDK: `delete_to_trash()` (uses TRASH op), `restore_from_trash()`, `list_trash()`
 Note: trash listing lags a few seconds after mutation (ISSUE-007).
@@ -407,7 +416,7 @@ GET /nms/metadata/version/<objectKey>  → 200
                      "createdDate": …, "isCurrentVersion": true, … } ] }
 ```
 
-⚠️ Envelope key is `objVersions` (not `versions`). Unknown key → `404`.
+ Envelope key is `objVersions` (not `versions`). Unknown key → `404`.
 SDK: `get_version_history()`
 
 ### Feeds & discovery (all GET, jaws-api)
@@ -430,8 +439,8 @@ SDK: `get_recent_objects()`, `get_spotlights()`, `get_shared_by_me()`,
 
 | Method | Path | Body | Status |
 |---|---|---|---|
-| POST | `/nms/folders` | `{"objectName","parentObjectKey","sourceName":"DRIVE"}` → **201** | ✅ |
-| POST | `/share/ulinks` | `{"objects":[{"objectKey"}…],"shareName":"25Aug2026_HHMMSS","shareType":"L"}` → **201** `{"shareURL":"https://www.jioaicloud.com/l/?u=<token>"}` | ✅ |
+| POST | `/nms/folders` | `{"objectName","parentObjectKey","sourceName":"DRIVE"}` → **201** |  |
+| POST | `/share/ulinks` | `{"objects":[{"objectKey"}…],"shareName":"25Aug2026_HHMMSS","shareType":"L"}` → **201** `{"shareURL":"https://www.jioaicloud.com/l/?u=<token>"}` |  |
 
 SDK: `create_folder()`, `create_share_link(keys[])` (multi-object supported)
 
@@ -508,6 +517,11 @@ typed error names, never raises to caller.
 # PAGE: Data Models (docs/DATA_MODELS.md)
 
 # Data Models & Schemas
+
+> **UNSTABLE TARGET — Last verified: 2026-08-25 (26/26 checks passed).**
+> Jio AI Cloud has no public API. Endpoints change without notice and can
+> break at any time. Features may stop working at any moment — check
+> [KNOWN_ISSUES.md](KNOWN_ISSUES.md) for current status.
 
 Typed dataclasses live in `jiocloud/models.py`. Every field maps to a
 verified production response shape (2026-08 captures).
@@ -591,7 +605,7 @@ counts (`files_count`, `image_count`, `video_count`, `audio_count`,
 
 ## JioFileVersion — from `/nms/metadata/version/<key>`
 
-⚠️ envelope: `{"totalVersions": N, "objVersions": [...]}`.
+ envelope: `{"totalVersions": N, "objVersions": [...]}`.
 Fields: `version_number` (`version`), `display_version`, timestamps,
 `is_current` (`isCurrentVersion`), `created_by_name`
 (`versionCreatedBy.firstName`), `last_updated_by`.
@@ -614,6 +628,11 @@ Fields: `version_number` (`version`), `display_version`, timestamps,
 # PAGE: Error Codes (docs/ERROR_CODES.md)
 
 # Error Codes — Production Taxonomy
+
+> **UNSTABLE TARGET — Last verified: 2026-08-25 (26/26 checks passed).**
+> Jio AI Cloud has no public API. Endpoints change without notice and can
+> break at any time. Features may stop working at any moment — check
+> [KNOWN_ISSUES.md](KNOWN_ISSUES.md) for current status.
 
 All codes below were **observed live** (2026-08-25) or present in verified
 captures. The SDK maps HTTP status to typed exceptions and, for batch
@@ -702,16 +721,21 @@ destination exists and `overwrite=False`.
 
 # KNOWN ISSUES & SERVER BEHAVIOR NOTES
 
+> **UNSTABLE TARGET — Last verified: 2026-08-25 (26/26 checks passed).**
+> Jio AI Cloud has no public API. Endpoints change without notice and can
+> break at any time. Features may stop working at any moment — check
+> [KNOWN_ISSUES.md](KNOWN_ISSUES.md) for current status.
+
 This project practices **radical honesty**: everything below was discovered by
 live testing against production Jio AI Cloud servers (2026-08-25) and is
 documented so contributors know exactly where the gaps are.
 **Anyone can contribute a fix** — see "How to help" under each issue.
 
-Status legend: ✅ verified working · ⚠️ works with caveats · ❌ broken / server-rejected
+Status legend: VERIFIED (working) · CAVEATS (works with caveats) · BROKEN (server-rejected)
 
 ---
 
-## ✅ ISSUE-001 (RESOLVED): Move-to-trash requires `TRASH` op + `status:"T"`
+## ISSUE-001 (RESOLVED): Move-to-trash requires `TRASH` op + `status:"T"`
 
 **History**
 The original traffic capture (2026-08-24 19:20) showed deletes working via:
@@ -749,14 +773,14 @@ exceptions instead of pretending success.
 
 ---
 
-## ✅ ISSUE-002 (RESOLVED): Restore-from-trash verified
+## ISSUE-002 (RESOLVED): Restore-from-trash verified
 
 Depends on ISSUE-001's flow. Verified end-to-end: trash → visible in
 `GET /nms/trash` → restore → gone from trash → re-trash → lands again.
 
 ---
 
-## ⚠️ ISSUE-003: `type` query param only accepts `f` or `w`
+## CAVEATS: ISSUE-003: `type` query param only accepts `f` or `w`
 
 `GET /nms/metadata*?type=…` rejects anything except `f` (files) / `w`
 (folders) with `400 NMSOM0129`. There is **no "list everything at once"**
@@ -765,7 +789,7 @@ by `stream_all_files()`.
 
 ---
 
-## ⚠️ ISSUE-004: Batch mutations require the FULL object echo
+## CAVEATS: ISSUE-004: Batch mutations require the FULL object echo
 
 `PUT /nms/metadata/1.0` operations (`SETFAV`, `UNSETFAV`, `RENAME`, `MOVE`,
 `TRASH`) fail constraint validation unless the object patch carries fields
@@ -780,7 +804,7 @@ errorCode`; `_metadata_op()` raises `InvalidRequestError` with that code.
 
 ---
 
-## ⚠️ ISSUE-005: Contacts service requires undocumented headers/params
+## CAVEATS: ISSUE-005: Contacts service requires undocumented headers/params
 
 `GET /amiko/cab/contacts` fails without BOTH:
 - `X-Offset: <n>` request header (error `TEJRF0400`)
@@ -793,7 +817,7 @@ with a populated address book: please verify page-walk works end-to-end.**
 
 ---
 
-## ⚠️ ISSUE-006: Content-Type mandatory on bodiless GETs
+## CAVEATS: ISSUE-006: Content-Type mandatory on bodiless GETs
 
 All Jio endpoints reject GETs without a `Content-Type` header
 (`NMSOM0003`, `BRSOM0036`). The SDK always sends it. Keep this in mind when
@@ -801,7 +825,7 @@ adding new endpoints.
 
 ---
 
-## ⚠️ ISSUE-007: Trash/listing eventual consistency (~2s)
+## CAVEATS: ISSUE-007: Trash/listing eventual consistency (~2s)
 
 Newly created items may take a second or two to appear in listings;
 mutations can lag similarly. Tests use short settle delays. If you see flaky
@@ -809,7 +833,7 @@ results in scripts, add small sleeps between mutate→list sequences.
 
 ---
 
-## 📝 Not implemented (endpoints exist in captures but lack verified contracts)
+## Not implemented (endpoints exist in captures but lack verified contracts)
 
 These appeared only as CORS preflights or were not exercised live; payloads
 are unknown, so we deliberately did NOT guess them:
@@ -843,6 +867,8 @@ Run `python tests/live_verify.py` yourself to reproduce the matrix locally.
 # PAGE: Disclaimer (docs/DISCLAIMER.md)
 
 # DISCLAIMER
+
+> **Note:** This project targets an UNSTABLE, unofficial API. Last verified against production: 2026-08-25 (26/26 checks). Endpoints can break at any time — see KNOWN_ISSUES.md.
 
 ## 1. Unofficial Project — No Affiliation, No Endorsement
 
@@ -940,6 +966,8 @@ removed, please open an issue in this project's repository.*
 
 # LEGAL.md — Legal & Compliance Notes
 
+> **Note:** This project targets an UNSTABLE, unofficial API. Last verified against production: 2026-08-25 (26/26 checks). Endpoints can break at any time — see KNOWN_ISSUES.md.
+
 This document summarizes the legal posture of the **Unofficial Jio AI Cloud
 Python SDK & CLI** project. It is informational, not legal advice.
 
@@ -970,7 +998,7 @@ quotas, redistributing copyrighted content, or any unlawful activity.
 
 ## 3. License
 
-MIT License — see [`LICENSE`](LICENSE). The license includes an additional
+MIT License — see [LICENSE](https://github.com/Ns81000/jiocloud_client/blob/main/LICENSE). The license includes an additional
 non-affiliation notice that forms part of the license text for this project.
 
 ## 4. Warranty Disclaimer & Limitation of Liability
@@ -985,7 +1013,7 @@ liability for:
 - **data loss** of any kind (always maintain independent backups);
 - misuse, credential leakage caused by user error, or third-party claims.
 
-Full text: [`DISCLAIMER.md`](DISCLAIMER.md) §3–§4.
+Full text: [DISCLAIMER.md](DISCLAIMER.md), sections 3-4.
 
 ## 5. Data Privacy & Credential Handling
 

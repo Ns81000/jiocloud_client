@@ -87,7 +87,7 @@ counts (`files_count`, `image_count`, `video_count`, `audio_count`,
 
 ## JioFileVersion — from `/nms/metadata/version/<key>`
 
-⚠️ envelope: `{"totalVersions": N, "objVersions": [...]}`.
+ envelope: `{"totalVersions": N, "objVersions": [...]}`.
 Fields: `version_number` (`version`), `display_version`, timestamps,
 `is_current` (`isCurrentVersion`), `created_by_name`
 (`versionCreatedBy.firstName`), `last_updated_by`.

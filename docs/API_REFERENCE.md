@@ -118,9 +118,9 @@ SDK: `rename_object()`, `move_object()`, `set_favorite()`, `delete_to_trash()`
 
 | Method | Path | Body | Status |
 |---|---|---|---|
-| PUT | `/nms/metadata/restore` | `{"objectKeys": ["<key>", …]}` | ✅ verified |
-| GET | `/nms/trash?limit=&sort=` | — | ✅ verified |
-| ~~PUT~~ | ~~`/nms/metadata/delete`~~ | legacy delete — now silently rejects all keys | ❌ deprecated server-side |
+| PUT | `/nms/metadata/restore` | `{"objectKeys": ["<key>", …]}` |  verified |
+| GET | `/nms/trash?limit=&sort=` | — |  verified |
+| ~~PUT~~ | ~~`/nms/metadata/delete`~~ | legacy delete — now silently rejects all keys |  deprecated server-side |
 
 SDK: `delete_to_trash()` (uses TRASH op), `restore_from_trash()`, `list_trash()`
 Note: trash listing lags a few seconds after mutation (ISSUE-007).
@@ -134,7 +134,7 @@ GET /nms/metadata/version/<objectKey>  → 200
                      "createdDate": …, "isCurrentVersion": true, … } ] }
 ```
 
-⚠️ Envelope key is `objVersions` (not `versions`). Unknown key → `404`.
+ Envelope key is `objVersions` (not `versions`). Unknown key → `404`.
 SDK: `get_version_history()`
 
 ### Feeds & discovery (all GET, jaws-api)
@@ -157,8 +157,8 @@ SDK: `get_recent_objects()`, `get_spotlights()`, `get_shared_by_me()`,
 
 | Method | Path | Body | Status |
 |---|---|---|---|
-| POST | `/nms/folders` | `{"objectName","parentObjectKey","sourceName":"DRIVE"}` → **201** | ✅ |
-| POST | `/share/ulinks` | `{"objects":[{"objectKey"}…],"shareName":"25Aug2026_HHMMSS","shareType":"L"}` → **201** `{"shareURL":"https://www.jioaicloud.com/l/?u=<token>"}` | ✅ |
+| POST | `/nms/folders` | `{"objectName","parentObjectKey","sourceName":"DRIVE"}` → **201** |  |
+| POST | `/share/ulinks` | `{"objects":[{"objectKey"}…],"shareName":"25Aug2026_HHMMSS","shareType":"L"}` → **201** `{"shareURL":"https://www.jioaicloud.com/l/?u=<token>"}` |  |
 
 SDK: `create_folder()`, `create_share_link(keys[])` (multi-object supported)
 

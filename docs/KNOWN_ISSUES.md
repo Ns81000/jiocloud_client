@@ -10,11 +10,11 @@ live testing against production Jio AI Cloud servers (2026-08-25) and is
 documented so contributors know exactly where the gaps are.
 **Anyone can contribute a fix** — see "How to help" under each issue.
 
-Status legend: ✅ verified working · ⚠️ works with caveats · ❌ broken / server-rejected
+Status legend: VERIFIED (working) · CAVEATS (works with caveats) · BROKEN (server-rejected)
 
 ---
 
-## ✅ ISSUE-001 (RESOLVED): Move-to-trash requires `TRASH` op + `status:"T"`
+## ISSUE-001 (RESOLVED): Move-to-trash requires `TRASH` op + `status:"T"`
 
 **History**
 The original traffic capture (2026-08-24 19:20) showed deletes working via:
@@ -52,14 +52,14 @@ exceptions instead of pretending success.
 
 ---
 
-## ✅ ISSUE-002 (RESOLVED): Restore-from-trash verified
+## ISSUE-002 (RESOLVED): Restore-from-trash verified
 
 Depends on ISSUE-001's flow. Verified end-to-end: trash → visible in
 `GET /nms/trash` → restore → gone from trash → re-trash → lands again.
 
 ---
 
-## ⚠️ ISSUE-003: `type` query param only accepts `f` or `w`
+## CAVEATS: ISSUE-003: `type` query param only accepts `f` or `w`
 
 `GET /nms/metadata*?type=…` rejects anything except `f` (files) / `w`
 (folders) with `400 NMSOM0129`. There is **no "list everything at once"**
@@ -68,7 +68,7 @@ by `stream_all_files()`.
 
 ---
 
-## ⚠️ ISSUE-004: Batch mutations require the FULL object echo
+## CAVEATS: ISSUE-004: Batch mutations require the FULL object echo
 
 `PUT /nms/metadata/1.0` operations (`SETFAV`, `UNSETFAV`, `RENAME`, `MOVE`,
 `TRASH`) fail constraint validation unless the object patch carries fields
@@ -83,7 +83,7 @@ errorCode`; `_metadata_op()` raises `InvalidRequestError` with that code.
 
 ---
 
-## ⚠️ ISSUE-005: Contacts service requires undocumented headers/params
+## CAVEATS: ISSUE-005: Contacts service requires undocumented headers/params
 
 `GET /amiko/cab/contacts` fails without BOTH:
 - `X-Offset: <n>` request header (error `TEJRF0400`)
@@ -96,7 +96,7 @@ with a populated address book: please verify page-walk works end-to-end.**
 
 ---
 
-## ⚠️ ISSUE-006: Content-Type mandatory on bodiless GETs
+## CAVEATS: ISSUE-006: Content-Type mandatory on bodiless GETs
 
 All Jio endpoints reject GETs without a `Content-Type` header
 (`NMSOM0003`, `BRSOM0036`). The SDK always sends it. Keep this in mind when
@@ -104,7 +104,7 @@ adding new endpoints.
 
 ---
 
-## ⚠️ ISSUE-007: Trash/listing eventual consistency (~2s)
+## CAVEATS: ISSUE-007: Trash/listing eventual consistency (~2s)
 
 Newly created items may take a second or two to appear in listings;
 mutations can lag similarly. Tests use short settle delays. If you see flaky
@@ -112,7 +112,7 @@ results in scripts, add small sleeps between mutate→list sequences.
 
 ---
 
-## 📝 Not implemented (endpoints exist in captures but lack verified contracts)
+## Not implemented (endpoints exist in captures but lack verified contracts)
 
 These appeared only as CORS preflights or were not exercised live; payloads
 are unknown, so we deliberately did NOT guess them:

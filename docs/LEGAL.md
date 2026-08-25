@@ -32,7 +32,7 @@ quotas, redistributing copyrighted content, or any unlawful activity.
 
 ## 3. License
 
-MIT License — see [`LICENSE`](LICENSE). The license includes an additional
+MIT License — see [LICENSE](https://github.com/Ns81000/jiocloud_client/blob/main/LICENSE). The license includes an additional
 non-affiliation notice that forms part of the license text for this project.
 
 ## 4. Warranty Disclaimer & Limitation of Liability
@@ -47,7 +47,7 @@ liability for:
 - **data loss** of any kind (always maintain independent backups);
 - misuse, credential leakage caused by user error, or third-party claims.
 
-Full text: [`DISCLAIMER.md`](DISCLAIMER.md) §3–§4.
+Full text: [DISCLAIMER.md](DISCLAIMER.md), sections 3-4.
 
 ## 5. Data Privacy & Credential Handling
 
