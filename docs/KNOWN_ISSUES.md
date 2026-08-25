@@ -136,6 +136,10 @@ mutations (#7), folder copy (#8).
 
 ## CAVEATS: ISSUE-008: Token identity segment can differ from `X-User-Id` after re-login
 
+> Tracker note: resolved protocol quirks are also archived as closed issues
+> (#9-#16) with full discovery/resolution narratives; open capability gaps
+> are tracked in #1-#8.
+
 Discovered 2026-08-25 during credential-rotation testing
 (`examples/setup_credentials.py`).
 
