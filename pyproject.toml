@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "jiocloud-client"
+version = "2.0.0"
+description = "Unofficial, high-performance Jio AI Cloud Python SDK, CLI and AI-agent tool server (personal backup & data portability)"
+readme = "README.md"
+requires-python = ">=3.8"
+license = { text = "MIT" }
+authors = [{ name = "Unofficial Jio Cloud API Project Contributors" }]
+keywords = ["jio", "jioaicloud", "cloud-storage", "backup", "unofficial", "sdk", "cli", "ai-agent", "mcp"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Topic :: System :: Archiving :: Backup",
+    "Topic :: Utilities",
+]
+dependencies = []
+
+[project.urls]
+# Fill in when the repository is published
+# Homepage = "https://github.com/YOUR_ACCOUNT/jiocloud_client"
+
+[project.scripts]
+jiocloud = "cli:main"
+
+[tool.setuptools]
+packages = ["jiocloud"]
+py-modules = ["cli"]
+
+[tool.setuptools.package-data]
+jiocloud = ["py.typed"]

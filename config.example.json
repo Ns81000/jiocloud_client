@@ -1,0 +1,10 @@
+{
+  "auth_token": "Basic YOUR_BASE64_SESSION_TOKEN_HERE",
+  "user_id": "YOUR_32_CHAR_USER_ID_HEX",
+  "device_key": "YOUR_DEVICE_KEY_UUID",
+  "api_key": "c153b48e-d8a1-48a0-a40d-293f1dc5be0e",
+  "app_secret": "ODc0MDE2M2EtNGY0MC00YmU2LTgwZDUtYjNlZjIxZGRkZjlj",
+  "client_details": "clientType:WEB; appVersion:86.0.1",
+  "device_type": "W",
+  "accept_language": "en-US,en;q=0.9"
+}

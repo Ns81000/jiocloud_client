@@ -1,0 +1,15 @@
+# Credentials — NEVER commit
+config.json
+*.token
+
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Local outputs
+jiocloud_backup/
+*_inventory.csv
+*_inventory.json
+.jiocloud_manifest.json
+_audit_*
