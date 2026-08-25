@@ -26,18 +26,12 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install MkDocs Material
-        run: pip install mkdocs-material
+      - name: Install MkDocs Material and gen-files plugin
+        run: pip install mkdocs-material mkdocs-gen-files
 
-      - name: Build (strict)
-        run: mkdocs build --strict --site-dir site
-
-      - name: Copy llms.txt files into the built site
-        run: |
-          cp llms.txt llms-full.txt site/
-          ls -la site/llms*.txt
-
-      - name: Deploy to GitHub Pages
-        # Deploy the PRE-BUILT site dir (--no-build) so the copied
-        # llms.txt / llms-full.txt are included in the push.
-        run: mkdocs gh-deploy --force --no-history --no-build --site-dir site
+      - name: Build (strict) and deploy to GitHub Pages
+        # gh-deploy builds into site-dir, then pushes that exact directory.
+        # The gen-files hook (docs/_gen_llms.py) injects llms.txt /
+        # llms-full.txt from the repo root into the build output, so both
+        # land at the Pages site root.
+        run: mkdocs gh-deploy --force --no-history --strict --site-dir site

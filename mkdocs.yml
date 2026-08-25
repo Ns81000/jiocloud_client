@@ -47,6 +47,17 @@ markdown_extensions:
           class: mermaid
           format: !!python/name:pymdownx.superfences.fence_code_format
 
+# Ship the LLM context files at the site root so agents can fetch
+# https://ns81000.github.io/jiocloud_client/llms.txt and /llms-full.txt
+plugins:
+  - search
+  - gen-files:
+      scripts:
+        - docs/_gen_llms.py
+
+exclude_docs: |
+  _gen_llms.py
+
 nav:
   - Home: index.md
   - Getting Started:
