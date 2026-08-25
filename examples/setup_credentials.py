@@ -21,6 +21,7 @@ config.json, never paste it into chats/issues/screenshots.
 import argparse
 import json
 import os
+import re
 import sys
 from pathlib import Path
 
@@ -31,6 +32,67 @@ sys.path.insert(0, str(PROJECT_ROOT))
 from jiocloud.auth import JioCloudAuth  # noqa: E402
 
 VALIDATE_URL = "https://api.jioaicloud.com/security/users"
+
+
+def parse_curl(raw: str) -> dict:
+    """Extract auth_token / user_id / device_key from a 'Copy as cURL' string.
+
+    Handles both POSIX ($'...' with \r) and Windows CMD (^-continuation)
+    variants Chrome produces, single or double quotes, and header names in
+    any case. Never prints the values.
+    """
+    # Join continuation lines so regexes see one long string.
+    s = raw.replace("\\\r\n", " ").replace("\\\n", " ").replace("^\r\n", " ").replace("^\n", " ")
+    s = s.replace("$'\\r'", "").replace("'\\r'", "")
+
+    out = {}
+    for m in re.finditer(r"-H\s*['\"]([^'\"]+)['\"]", s):
+        hdr = m.group(1)
+        name, _, value = hdr.partition(":")
+        lk = name.strip().lower()
+        if lk == "authorization":
+            out["auth_token"] = value.strip()
+        elif lk == "x-user-id":
+            out["user_id"] = value.strip()
+        elif lk == "x-device-key":
+            out["device_key"] = value.strip()
+    return out
+
+
+def do_validate_and_write(auth_token: str, user_id: str, device_key: str, force: bool) -> None:
+    """Shared tail for both --from-curl and the interactive flow."""
+    auth = JioCloudAuth(auth_token=auth_token, user_id=user_id, device_key=device_key)
+
+    peek = auth.peek_token_identity()
+    if peek and peek.lower() != user_id.lower():
+        print(f"\nWARNING: decoded token identity ({peek[:8]}...) does not match "
+              f"user_id ({user_id[:8]}...). Continuing anyway, but double-check.")
+
+    print(f"\nValidating credentials against {VALIDATE_URL} ...")
+    try:
+        payload = validate(auth)
+    except Exception as exc:
+        code = getattr(exc, "code", None)
+        print("\nVALIDATION FAILED.", file=sys.stderr)
+        if code == 401:
+            print("401 Unauthorized (TEJGA0401): token expired or logged out.",
+                  file=sys.stderr)
+            print("Log in again at https://www.jioaicloud.com and re-extract the "
+                  "headers (docs/GET_CREDENTIALS.md).", file=sys.stderr)
+        else:
+            print(f"{type(exc).__name__}: {exc}", file=sys.stderr)
+            print("Check that all three values are complete and untruncated.",
+                  file=sys.stderr)
+        sys.exit(3)
+
+    print("\nSUCCESS - credentials are valid.")
+    print(f"Profile: {extract_profile(payload)}")
+
+    config_path = PROJECT_ROOT / "config.json"
+    write_config(config_path,
+                 {"auth_token": auth_token, "user_id": user_id,
+                  "device_key": device_key},
+                 force=force)
 
 
 def prompt_value(label: str, hint: str) -> str:
@@ -85,12 +147,38 @@ def main() -> None:
                         help="overwrite an existing config.json")
     parser.add_argument("--show-extractor", action="store_true",
                         help="print the one-paste browser console extractor "
-                             "and exit (same as examples/browser_console_extractor.js)")
+                             "(same as examples/browser_console_extractor.js)")
+    parser.add_argument("--from-curl", action="store_true",
+                        help="read a 'Copy as cURL' command from stdin (or a "
+                             "file path passed after --curl-file) and extract "
+                             "the three credential headers from it")
+    parser.add_argument("--curl-file", default=None,
+                        help="file containing the copied cURL command")
     args = parser.parse_args()
 
     if args.show_extractor:
         js = Path(__file__).with_name("browser_console_extractor.js")
         print(js.read_text(encoding="utf-8"))
+        return
+
+    if args.from_curl:
+        if args.curl_file:
+            raw = Path(args.curl_file).read_text(encoding="utf-8")
+        else:
+            print("Paste the 'Copy as cURL' output (right-click the request in")
+            print("DevTools Network tab -> Copy -> Copy as cURL), then press Enter:")
+            raw = sys.stdin.read()
+        vals = parse_curl(raw)
+        missing = [k for k in ("auth_token", "user_id", "device_key") if not vals.get(k)]
+        if missing:
+            print(f"\nERROR: could not find header(s) {missing} in the pasted "
+                  "command. Make sure you copied a request TO a "
+                  "*.jioaicloud.com URL.", file=sys.stderr)
+            sys.exit(4)
+        auth_token = f"Basic {vals['auth_token'].removeprefix('Basic ').strip()}"
+        user_id, device_key = vals["user_id"], vals["device_key"]
+        # fall through to validation + write below
+        do_validate_and_write(auth_token, user_id, device_key, args.force)
         return
 
     print("=" * 62)

@@ -1,166 +1,166 @@
 /**
- * Jio AI Cloud — one-paste credential extractor (Chrome DevTools Console)
+ * Jio AI Cloud — one-paste credential extractor v2 (Chrome DevTools Console)
  *
  * HOW TO USE
  * 1. Log in to https://www.jioaicloud.com in Chrome.
- * 2. Press F12, open the Console tab.
- * 3. Paste this ENTIRE file's contents and press Enter.
- * 4. While it captures (about 15 seconds), click around the app — e.g. open
- *    "My Files" or refresh the page with F5 — so it fires API requests.
- * 5. It prints a ready-to-use config.json. Copy it into the project root,
- *    or feed the three values to examples/setup_credentials.py.
+ * 2. Press F12, open the Console tab. Make sure the context dropdown at the
+ *    top of the console says "top" (not an iframe).
+ * 3. Paste this ENTIRE file and press Enter. A pink toast appears top-right.
+ * 4. IMPORTANT: do NOT reload the page (F5 wipes the watcher). Instead click
+ *    around INSIDE the app: open My Files, Photos, open then close a file.
+ * 5. When all three values are found, the toast turns green and shows the
+ *    values; the full config.json JSON is printed here in the Console.
  *
- * How it works: window.fetch is wrapped BEFORE any request is made; every
- * response whose URL matches *.jioaicloud.com has its request headers read.
- * If nothing is captured (the app may use XMLHttpRequest or an already-bound
- * fetch), fall back to the Network-tab method in docs/GET_CREDENTIALS.md.
+ * How it works: window.fetch and XMLHttpRequest are wrapped BEFORE requests
+ * fire; request headers of *.jioaicloud.com calls are inspected. Originals
+ * are restored afterwards. Nothing is transmitted anywhere by this script.
  *
- * Privacy: values are printed to YOUR console only. Nothing is transmitted
- * anywhere by this script. Never paste the output into any chat/issue/page.
+ * If nothing is captured within 30s, use the cURL method instead:
+ * DevTools Network tab -> click any jioaicloud.com request -> right-click ->
+ * Copy -> Copy as cURL -> run:  python examples/setup_credentials.py --from-curl
  */
 (function () {
   "use strict";
 
-  var FOUND = {};           // header name -> value
+  var FOUND = {};
   var CAPTURED_URLS = 0;
   var NEEDED = ["authorization", "x-user-id", "x-device-key"];
   var DONE = false;
 
-  function label(name) {
-    switch (name) {
-      case "authorization":  return "auth_token";
-      case "x-user-id":      return "user_id";
-      case "x-device-key":   return "device_key";
-    }
-    return name;
+  // ---- On-page toast (works even when console filtering hides logs) ------
+  var toast = null, toastLines = {};
+  function ensureToast() {
+    if (toast) return toast;
+    toast = document.createElement("div");
+    toast.style.cssText = "position:fixed;top:14px;right:14px;z-index:2147483647;" +
+      "background:#b3266e;color:#fff;padding:12px 16px;border-radius:10px;" +
+      "font:13px/1.45 monospace;max-width:420px;box-shadow:0 4px 18px rgba(0,0,0,.4);";
+    (document.body || document.documentElement).appendChild(toast);
+    return toast;
+  }
+  function setToast(html) { ensureToast().innerHTML = html; }
+  function toastState() {
+    var have = NEEDED.filter(function (h) { return FOUND[h]; }).length;
+    var rows = NEEDED.map(function (h) {
+      var v = FOUND[h];
+      return "<div>" + (v ? "\u2713" : "\u2022") + " " + h + ": <b>" +
+        (v ? String(v).slice(0, 10) + "\u2026" : "waiting") + "</b></div>";
+    }).join("");
+    setToast("<div style='font-weight:bold;margin-bottom:4px'>Jio extractor: " +
+      have + "/3 captured \u2014 now CLICK AROUND the app (do NOT press F5)</div>" + rows);
   }
 
   function record(headers) {
     if (!headers) return;
     CAPTURED_URLS++;
     Object.keys(headers).forEach(function (k) {
-      var lk = k.toLowerCase();
+      var lk = String(k).toLowerCase();
       if (NEEDED.indexOf(lk) !== -1 && !FOUND[lk]) {
-        FOUND[lk] = headers[k];
+        FOUND[lk] = String(headers[k]).trim();
       }
     });
     if (!DONE && NEEDED.every(function (h) { return FOUND[h]; })) {
       DONE = true;
       report();
+    } else {
+      toastState();
     }
   }
 
-  // --- Strategy A: wrap window.fetch --------------------------------------
-  if (typeof window.fetch === "function") {
-    var origFetch = window.fetch;
+  // ---- Strategy A: wrap window.fetch --------------------------------------
+  var origFetch = (typeof window.fetch === "function") ? window.fetch : null;
+  if (origFetch) {
     window.fetch = function () {
-      var args = arguments;
       try {
-        var input = args[0];
+        var input = arguments[0];
         var url = (typeof input === "string") ? input :
                   (input && input.url) ? input.url : String(input);
-        var init = args[1] || {};
+        var init = arguments[1] || {};
         var headers = {};
-        // Merge Headers object / plain object from the Request or init.
         var hsrc = init.headers || (input && input.headers);
         if (hsrc) {
-          if (typeof hsrc.forEach === "function") {
-            hsrc.forEach(function (v, k) { headers[k] = v; });
-          } else if (typeof hsrc === "object") {
-            Object.keys(hsrc).forEach(function (k) { headers[k] = hsrc[k]; });
-          }
+          if (typeof hsrc.forEach === "function") hsrc.forEach(function (v, k) { headers[k] = v; });
+          else if (typeof hsrc === "object") Object.keys(hsrc).forEach(function (k) { headers[k] = hsrc[k]; });
         }
         if (/jioaicloud\.com/i.test(url)) record(headers);
-      } catch (e) { /* never break the app */ }
-      return origFetch.apply(this, args);
+      } catch (e) {}
+      return origFetch.apply(this, arguments);
     };
   }
 
-  // --- Strategy B: wrap XMLHttpRequest.setRequestHeader --------------------
-  var xhrState = null; // per-request header bag via onreadystatechange trick
-  if (typeof window.XMLHttpRequest === "function") {
-    var origOpen = XMLHttpRequest.prototype.open;
-    var origSet = XMLHttpRequest.prototype.setRequestHeader;
-    var origSend = XMLHttpRequest.prototype.send;
+  // ---- Strategy B: wrap XMLHttpRequest ------------------------------------
+  var origOpen = XMLHttpRequest.prototype.open,
+      origSet = XMLHttpRequest.prototype.setRequestHeader,
+      origSend = XMLHttpRequest.prototype.send;
+  XMLHttpRequest.prototype.open = function (m, u) {
+    this.__jc_url = u; this.__jc_headers = {};
+    return origOpen.apply(this, arguments);
+  };
+  XMLHttpRequest.prototype.setRequestHeader = function (n, v) {
+    try {
+      if (this.__jc_headers && /jioaicloud\.com/i.test(this.__jc_url || "")) {
+        this.__jc_headers[n] = v;
+      }
+    } catch (e) {}
+    return origSet.apply(this, arguments);
+  };
+  XMLHttpRequest.prototype.send = function () {
+    try {
+      if (/jioaicloud\.com/i.test(this.__jc_url || "")) record(this.__jc_headers);
+    } catch (e) {}
+    return origSend.apply(this, arguments);
+  };
 
-    XMLHttpRequest.prototype.open = function (method, url) {
-      this.__jc_url = url;
-      this.__jc_headers = {};
-      return origOpen.apply(this, arguments);
-    };
-    XMLHttpRequest.prototype.setRequestHeader = function (name, value) {
-      try {
-        if (this.__jc_headers && /jioaicloud\.com/i.test(this.__jc_url || "")) {
-          this.__jc_headers[name] = value;
-        }
-      } catch (e) { /* ignore */ }
-      return origSet.apply(this, arguments);
-    };
-    XMLHttpRequest.prototype.send = function () {
-      try {
-        if (/jioaicloud\.com/i.test(this.__jc_url || "")) record(this.__jc_headers);
-      } catch (e) { /* ignore */ }
-      return origSend.apply(this, arguments);
-    };
-  }
-
-  // --- Report --------------------------------------------------------------
-  function fmt(v) {
-    // Authorization may arrive without the "Basic " prefix; normalize.
-    return String(v).trim();
-  }
-
+  // ---- Report --------------------------------------------------------------
   function report() {
-    var auth = fmt(FOUND["authorization"]);
+    var auth = FOUND["authorization"];
     if (!/^basic\s/i.test(auth)) auth = "Basic " + auth;
+    var cfg = { auth_token: auth, user_id: FOUND["x-user-id"], device_key: FOUND["x-device-key"] };
 
-    console.log("%c==============================================", "color:#0a0;font-weight:bold");
-    console.log("%c Jio AI Cloud credentials captured.", "color:#0a0;font-weight:bold");
-    console.log("%c Copy the JSON below into config.json", "color:#0a0");
-    console.log("%c (or run: python examples/setup_credentials.py)", "color:#0a0");
-    console.log("%c----------------------------------------------", "color:#0a0");
-    console.log(JSON.stringify({
-      "_comment_1": "auth_token = Authorization header (Basic ...)",
-      "_comment_2": "user_id   = X-User-Id header",
-      "_comment_3": "device_key= X-Device-Key header",
-      "auth_token": auth,
-      "user_id": fmt(FOUND["x-user-id"]),
-      "device_key": fmt(FOUND["x-device-key"])
-    }, null, 2));
-    console.log("%c==============================================", "color:#0a0;font-weight:bold");
-    console.log("Labeled values:");
-    console.log("  auth_token : " + auth.slice(0, 14) + "...(truncated here for safety)");
-    console.log("  user_id    : " + fmt(FOUND["x-user-id"]));
-    console.log("  device_key : " + fmt(FOUND["x-device-key"]));
-    console.log("Requests inspected: " + CAPTURED_URLS);
-    restore();
+    setToast("<div style='font-weight:bold'>\u2713 Credentials captured!</div>" +
+      "<div style='margin-top:6px;white-space:pre-wrap'>" +
+      "auth_token: " + auth.slice(0, 12) + "...(truncated)\n" +
+      "user_id: " + cfg.user_id + "\n" +
+      "device_key: " + cfg.device_key + "</div>" +
+      "<div style='margin-top:6px'>Full config.json printed in the Console.</div>");
+    setTimeout(restore, 60000); // leave the green toast readable
+
+    console.log("%c========== Jio AI Cloud credentials captured ========== ",
+                "color:#fff;background:#0a7d32;font-weight:bold;padding:2px 6px");
+    console.log(JSON.stringify(cfg, null, 2));
+    console.log("%c Copy the object above into config.json, or re-run:  " +
+                "python examples/setup_credentials.py   and paste the three values.",
+                "color:#0a7d32;font-weight:bold");
+    console.log("Requests inspected:", CAPTURED_URLS);
   }
 
   function restore() {
-    // Put original functions back so the app is untouched afterwards.
     try {
-      if (origFetchRef) window.fetch = origFetchRef;
-      XMLHttpRequest.prototype.open = origOpenRef;
-      XMLHttpRequest.prototype.setRequestHeader = origSetRef;
-      XMLHttpRequest.prototype.send = origSendRef;
-    } catch (e) { /* ignore */ }
+      if (origFetch) window.fetch = origFetch;
+      XMLHttpRequest.prototype.open = origOpen;
+      XMLHttpRequest.prototype.setRequestHeader = origSet;
+      XMLHttpRequest.prototype.send = origSend;
+    } catch (e) {}
   }
 
-  var origFetchRef = (typeof origFetch !== "undefined") ? origFetch : null;
-  var origOpenRef  = origOpen, origSetRef = origSet, origSendRef = origSend;
+  // ---- Kick off -------------------------------------------------------------
+  toastState();
+  console.log("%c[Jio extractor v2] Watching *.jioaicloud.com requests. " +
+              "Click around INSIDE the app now - do NOT reload (F5).",
+              "color:#e80;font-weight:bold");
 
-  console.log("%c[Jio extractor] Watching *.jioaicloud.com requests...", "color:#e80;font-weight:bold");
-  console.log("%cNOW CLICK AROUND THE APP or press F5 to trigger API calls.", "color:#e80;font-weight:bold");
-  console.log("(Fallback: Network tab -> click any jioaicloud request -> Headers -> copy");
-  console.log(" Authorization / X-User-Id / X-Device-Key manually.)");
-
-  // Safety net: report whatever was found after 20s even if incomplete.
   setTimeout(function () {
-    if (!DONE && Object.keys(FOUND).length > 0) { DONE = true; report(); }
-    else if (!DONE) {
-      console.warn("[Jio extractor] No matching requests captured. The app may not have fired any calls.");
-      console.warn("Try pressing F5 while this is installed, or use the Network tab method in docs/GET_CREDENTIALS.md.");
-      restore();
+    if (DONE) return;
+    restore();
+    if (Object.keys(FOUND).length > 0) {
+      setToast("<div style='font-weight:bold'>Partial capture after 30s</div>" +
+        "<div>Got " + NEEDED.filter(function (h){return FOUND[h];}).length +
+        "/3. Keep clicking around, or re-paste the script to continue.</div>");
+    } else {
+      setToast("<div style='font-weight:bold'>No jioaicloud requests seen in 30s.</div>" +
+        "<div>Use the cURL method instead:<br>Network tab &rarr; click any " +
+        "jioaicloud.com request &rarr; right-click &rarr; Copy &rarr; Copy as cURL," +
+        "<br>then run:<br><b>python examples/setup_credentials.py --from-curl</b></div>");
     }
-  }, 20000);
+  }, 30000);
 })();
