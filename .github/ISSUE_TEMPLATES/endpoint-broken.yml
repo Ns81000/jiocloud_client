@@ -1,0 +1,62 @@
+name: Endpoint broken
+description: Report an SDK/CLI operation that stopped working against the live service.
+title: "[BROKEN] <method or CLI command> - <error code>"
+labels: ["broken-endpoint"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Jio AI Cloud has no public API and changes contracts without notice.
+        Check [KNOWN_ISSUES.md](../blob/main/docs/KNOWN_ISSUES.md) first — your issue may already be documented.
+        **Never paste live tokens, user IDs, device keys, or personal file names.**
+  - type: dropdown
+    id: surface
+    attributes:
+      label: Affected surface
+      options:
+        - SDK (jiocloud.client)
+        - CLI (cli.py)
+        - Agent tools / MCP server
+        - Credential setup
+    validations:
+      required: true
+  - type: input
+    id: method
+    attributes:
+      label: SDK method / CLI command / agent tool
+      placeholder: e.g. delete_to_trash() / cli.py trash / move_to_trash tool
+    validations:
+      required: true
+  - type: textarea
+    id: endpoint
+    attributes:
+      label: Underlying endpoint (if known)
+      placeholder: "METHOD https://host/path"
+    validations:
+      required: false
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+  - type: input
+    id: error_code
+    attributes:
+      label: Server error code + HTTP status
+      placeholder: "e.g. NMSOM0129, HTTP 400"
+    validations:
+      required: true
+  - type: checkboxes
+    id: capture
+    attributes:
+      label: Traffic capture offer
+      options:
+        - label: I can capture fresh traffic from my own account's web session and attach a REDACTED request shape (headers stripped of Authorization/X-User-Id/X-Device-Key)
+        - label: My config.json token is freshly extracted (not a logged-out/expired session causing 401 TEJGA0401)

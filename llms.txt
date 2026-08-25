@@ -1,0 +1,48 @@
+# Unofficial Jio AI Cloud Python SDK, CLI & AI-Agent Tools
+
+> High-performance, zero-dependency (Python 3.8+ stdlib only) SDK, CLI, and
+> AI-agent tool server for Jio AI Cloud storage — protocol knowledge
+> reverse-engineered from the owner's own account traffic and verified against
+> live production servers on 2026-08-25 (26/26 checks passed).
+> UNSTABLE TARGET: Jio AI Cloud has no public API; endpoints change without
+> notice and can break at any time. Check KNOWN_ISSUES.md for current status.
+> Unofficial project — not affiliated with Reliance Jio Infocomm Ltd.
+
+## Documentation
+
+- [Getting Credentials](https://ns81000.github.io/jiocloud_client/GET_CREDENTIALS/): extract your own session values via one-paste DevTools script or manual Network-tab method, then validate with setup_credentials.py
+- [Authentication](https://ns81000.github.io/jiocloud_client/AUTHENTICATION/): verified header contract, token lifetime, credential safety rules
+- [API Reference](https://ns81000.github.io/jiocloud_client/API_REFERENCE/): every verified endpoint, parameters, payloads, response shapes
+- [Data Models](https://ns81000.github.io/jiocloud_client/DATA_MODELS/): typed entity schemas returned by the client
+- [Error Codes](https://ns81000.github.io/jiocloud_client/ERROR_CODES/): production error taxonomy and handling guidance
+
+## Examples
+
+- [01 Quickstart](https://github.com/Ns81000/jiocloud_client/blob/main/examples/01_quickstart.py): connect, profile, quota
+- [02 List and Search](https://github.com/Ns81000/jiocloud_client/blob/main/examples/02_list_and_search.py): recursive cataloging and full-text search
+- [03 Batch Download](https://github.com/Ns81000/jiocloud_client/blob/main/examples/03_batch_download.py): multi-threaded sync with skip-existing
+- [04 Folder and Trash Management](https://github.com/Ns81000/jiocloud_client/blob/main/examples/04_folder_and_trash_management.py): create/rename/move/trash/restore cycle
+- [05 Share Links](https://github.com/Ns81000/jiocloud_client/blob/main/examples/05_share_links.py): multi-object public share links
+- [06 Agent Integration](https://github.com/Ns81000/jiocloud_client/blob/main/examples/06_agent_integration.py): LLM/MCP function-calling demo
+- [07 Incremental Backup](https://github.com/Ns81000/jiocloud_client/blob/main/examples/07_incremental_backup.py): manifest-based delta backup
+- [08 Inventory Export](https://github.com/Ns81000/jiocloud_client/blob/main/examples/08_inventory_export.py): CSV/JSON export plus analytics
+
+## AI Assets
+
+- [SKILL.md](https://github.com/Ns81000/jiocloud_client/blob/main/ai/skills/jio-cloud-manager/SKILL.md): installable AI skill — auth contract, safe patterns, confirmation rules
+- [OpenAI Function Schema](https://github.com/Ns81000/jiocloud_client/blob/main/ai/tools/openai-function-schema.json): all 16 tools in OpenAI tools format
+- [Anthropic Tools Schema](https://github.com/Ns81000/jiocloud_client/blob/main/ai/tools/anthropic-tools.json): same 16 tools in Anthropic tool-use format
+- [System Prompt](https://github.com/Ns81000/jiocloud_client/blob/main/ai/prompts/system-prompt.txt): paste-ready operational prompt for any LLM
+- [Example Conversation](https://github.com/Ns81000/jiocloud_client/blob/main/ai/examples/agent-conversation.md): multi-turn agent demo including destructive-op confirmations
+
+## Reference
+
+- [Known Issues](https://ns81000.github.io/jiocloud_client/KNOWN_ISSUES/): verified server quirks, dead endpoints, gaps, how to contribute fixes
+- [Disclaimer](https://ns81000.github.io/jiocloud_client/DISCLAIMER/): AS-IS warranty, liability limits, personal-backup clause, privacy notice
+- [Legal Notes](https://ns81000.github.io/jiocloud_client/LEGAL/): compliance summary and takedown contact
+- [Changelog](https://github.com/Ns81000/jiocloud_client/blob/main/CHANGELOG.md): release history with verification stamps
+- [Contributing](https://github.com/Ns81000/jiocloud_client/blob/main/CONTRIBUTING.md): reporting broken endpoints, capture-based fixes
+
+## Optional
+
+- [llms-full.txt](https://ns81000.github.io/jiocloud_client/llms-full.txt): this entire documentation set concatenated into a single file for one-fetch context

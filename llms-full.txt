@@ -1,0 +1,1125 @@
+# Unofficial Jio AI Cloud Python SDK, CLI & AI-Agent Tools — Full Documentation
+
+> This file embeds the COMPLETE documentation set in one place so an agent
+> fetching a single URL gets full context with no crawling.
+>
+> UNSTABLE TARGET: Jio AI Cloud has no public API. Endpoints change without
+> notice and can break at any time. Last verified against production on
+> 2026-08-25 (26/26 checks passed). Check KNOWN_ISSUES.md for current status.
+>
+> Unofficial project - not affiliated with Reliance Jio Infocomm Ltd.
+> "Jio" / "Jio AI Cloud" are trademarks of their respective owners.
+
+
+
+---
+
+# PAGE: Getting Credentials (docs/GET_CREDENTIALS.md)
+
+# Getting Your Credentials
+
+UNSTABLE TARGET WARNING — Last verified: 2026-08-25 (26/26 live checks passed).
+Jio AI Cloud has no public API; endpoints change without notice and can break
+at any time. Check [KNOWN_ISSUES.md](KNOWN_ISSUES.md) for current status.
+
+---
+
+This guide shows you how to extract the three session values the SDK needs
+**from your own Jio AI Cloud account**, then validate and store them locally.
+
+## Prerequisites
+
+- **Your own Jio AI Cloud account only.** Extracting another person's session
+  credentials without authorization is illegal and explicitly against this
+  project's terms ([DISCLAIMER.md](DISCLAIMER.md)).
+- Chrome or any Chromium browser (Edge works identically).
+- About two minutes.
+
+The three values:
+
+| config.json key | HTTP header | Looks like |
+|---|---|---|
+| `auth_token` | `Authorization` | `Basic <long base64 string>` |
+| `user_id` | `X-User-Id` | 32-char hex |
+| `device_key` | `X-Device-Key` | UUID |
+
+> The SDK also sends `X-Api-Key` / `X-App-Secret`, but those are public
+> web-app constants baked into every Jio AI Cloud web session — not secrets,
+> already defaulted inside `jiocloud/auth.py`. You never need to extract them.
+
+## Method 1 — One-Paste Console Script (recommended)
+
+1. Log in at <https://www.jioaicloud.com>.
+2. Press **F12** → open the **Console** tab.
+3. Paste the entire contents of
+   [`examples/browser_console_extractor.js`](https://github.com/Ns81000/jiocloud_client/blob/main/examples/browser_console_extractor.js)
+   and press Enter. (Canonical copy lives in that file; the block below is the
+   same script.)
+4. While it watches (about 20 seconds), click around the app — open *My Files*,
+   or just press F5 — so it fires API calls.
+5. It prints your three values as ready-to-paste JSON:
+
+```json
+{
+  "auth_token": "Basic ...",
+  "user_id": "...",
+  "device_key": "..."
+}
+```
+
+6. Run `python examples/setup_credentials.py` and paste the values when
+   prompted — it validates them live and writes `config.json`. Or skip the
+   helper and paste the JSON into `config.json` yourself (copy
+   `config.example.json` first).
+
+<details>
+<summary>The one-paste script (same as <code>examples/browser_console_extractor.js</code>)</summary>
+
+```javascript
+(function () {
+  "use strict";
+  var FOUND = {}, CAPTURED_URLS = 0, DONE = false;
+  var NEEDED = ["authorization", "x-user-id", "x-device-key"];
+  function label(n){return {authorization:"auth_token","x-user-id":"user_id","x-device-key":"device_key"}[n]||n;}
+  function record(headers){
+    if(!headers) return;
+    CAPTURED_URLS++;
+    Object.keys(headers).forEach(function(k){
+      var lk=k.toLowerCase();
+      if(NEEDED.indexOf(lk)!==-1 && !FOUND[lk]) FOUND[lk]=headers[k];
+    });
+    if(!DONE && NEEDED.every(function(h){return FOUND[h];})){DONE=true;report();}
+  }
+  var origFetch = window.fetch;
+  window.fetch = function(){
+    try{
+      var input=arguments[0];
+      var url=(typeof input==="string")?input:(input&&input.url)?input.url:String(input);
+      var init=arguments[1]||{}, headers={}, hsrc=init.headers||(input&&input.headers);
+      if(hsrc){
+        if(typeof hsrc.forEach==="function"){hsrc.forEach(function(v,k){headers[k]=v;});}
+        else if(typeof hsrc==="object"){Object.keys(hsrc).forEach(function(k){headers[k]=hsrc[k];});}
+      }
+      if(/jioaicloud\.com/i.test(url)) record(headers);
+    }catch(e){}
+    return origFetch.apply(this,arguments);
+  };
+  var origOpen=XMLHttpRequest.prototype.open,
+      origSet=XMLHttpRequest.prototype.setRequestHeader,
+      origSend=XMLHttpRequest.prototype.send;
+  XMLHttpRequest.prototype.open=function(m,u){this.__jc_url=u;this.__jc_headers={};return origOpen.apply(this,arguments);};
+  XMLHttpRequest.prototype.setRequestHeader=function(n,v){
+    try{if(this.__jc_headers&&/jioaicloud\.com/i.test(this.__jc_url||""))this.__jc_headers[n]=v;}catch(e){}
+    return origSet.apply(this,arguments);};
+  XMLHttpRequest.prototype.send=function(){
+    try{if(/jioaicloud\.com/i.test(this.__jc_url||""))record(this.__jc_headers);}catch(e){}
+    return origSend.apply(this,arguments);};
+  function report(){
+    var auth=String(FOUND["authorization"]).trim();
+    if(!/^basic\s/i.test(auth)) auth="Basic "+auth;
+    console.log("=== Jio AI Cloud credentials captured ===");
+    console.log(JSON.stringify({auth_token:auth,user_id:String(FOUND["x-user-id"]).trim(),
+      device_key:String(FOUND["x-device-key"]).trim()},null,2));
+    console.log("Requests inspected:",CAPTURED_URLS);
+    restore();
+  }
+  function restore(){try{window.fetch=origFetch;
+    XMLHttpRequest.prototype.open=origOpen;
+    XMLHttpRequest.prototype.setRequestHeader=origSet;
+    XMLHttpRequest.prototype.send=origSend;}catch(e){}}
+  console.log("[Jio extractor] Watching *.jioaicloud.com requests...");
+  console.log("NOW CLICK AROUND THE APP or press F5 to trigger API calls.");
+  setTimeout(function(){
+    if(!DONE && Object.keys(FOUND).length>0){DONE=true;report();}
+    else if(!DONE){console.warn("[Jio extractor] Nothing captured - use Method 2 below.");restore();}
+  },20000);
+})();
+```
+
+</details>
+
+**How it works:** before any request fires, the script wraps `window.fetch`
+and `XMLHttpRequest.setRequestHeader`. Every call to a `*.jioaicloud.com` URL
+has its request headers inspected, and the three needed values are captured
+the moment they appear. It restores the originals afterwards and touches
+nothing else. Everything happens in your browser — nothing is transmitted
+anywhere by the script itself.
+
+## Method 2 — Manual Network Tab (works even if Method 1 captures nothing)
+
+1. Log in at <https://www.jioaicloud.com>.
+2. Press **F12** → open the **Network** tab.
+3. Press F5 or click around so requests appear.
+4. Click any request whose URL contains `jioaicloud.com`.
+5. In the right pane, open **Headers → Request Headers** and copy:
+   - `Authorization:` → everything including the word `Basic` → `auth_token`
+   - `X-User-Id:` → `user_id`
+   - `X-Device-Key:` → `device_key`
+6. Continue with step 6 above.
+
+Tip (Chrome): instead of copying manually, right-click the request →
+**Copy → Copy as cURL**, paste into a text editor, and pick the three header
+values out of it. Never share that cURL string anywhere — it contains your token.
+
+## Validate and Store: `setup_credentials.py`
+
+```bash
+python examples/setup_credentials.py
+```
+
+It will:
+
+1. Prompt for the three values.
+2. Call `GET https://api.jioaicloud.com/security/users` with the constructed
+   headers and print your profile name / email on success.
+3. Write `config.json` next to the SDK (refuses to overwrite an existing file
+   unless you pass `--force`).
+4. Print file-permission guidance (`chmod 600` on Linux/macOS; applied
+   automatically there).
+
+A `401 TEJGA0401` during validation means the token was already logged out or
+expired — re-extract and retry.
+
+## Verify
+
+```bash
+python cli.py info
+```
+
+You should see your account name and quota breakdown.
+
+## Safety Rules
+
+- Credentials are for **your own account** and stay on **your machine**.
+- They are transmitted **only** to official `*.jioaicloud.com` hosts over TLS.
+- This project has zero telemetry and never writes credentials elsewhere.
+- Never commit `config.json` (already `.gitignore`d) and never paste tokens
+  into issues, screenshots, or chats. If leaked, log out of the web session —
+  that revokes the token immediately.
+
+---
+
+# PAGE: Authentication (docs/AUTHENTICATION.md)
+
+# Authentication & Security
+
+## 1. Header Contract (verified against production)
+
+Every request — **including bodiless GETs** — must carry:
+
+| Header | Value | Notes |
+|---|---|---|
+| `Authorization` | `Basic <base64 session token>` | From your web session |
+| `X-User-Id` | 32-char hex user id | Matches the id embedded in the token |
+| `X-Device-Key` | UUID | The browser device registration id |
+| `X-Device-Type` | `W` | Web |
+| `X-Api-Key` | `c153b48e-d8a1-48a0-a40d-293f1dc5be0e` | Public web-app constant (not a secret) |
+| `X-App-Secret` | `ODc0MDE2M2EtNGY0MC00YmU2LTgwZDUtYjNlZjIxZGRkZjlj` | Public web-app constant (decodes to a UUID; not per-user) |
+| `X-Client-Details` | `clientType:WEB; appVersion:86.0.1` | App version marker |
+| `Accept`, `Content-Type` | `application/json; charset=UTF-8` | **Content-Type required even on GETs** (`400 NMSOM0003` / `BRSOM0036` otherwise) |
+| `User-Agent`, `Accept-Language` | Browser-like string / `en-US,en;q=0.9` | Missing Accept-Language → `400 NMSOM0001` |
+
+The SDK builds all of this in `jiocloud.auth.JioCloudAuth.get_headers()`.
+Contacts endpoints additionally require `X-Offset` / `X-CHUNK-SIZE`
+(see [API_REFERENCE.md](API_REFERENCE.md), section 5).
+
+## 2. Extracting Your Own Session Credentials
+
+1. Log in to **your** Jio AI Cloud account in Chrome.
+2. Open DevTools → Network tab.
+3. Click any request to `*.jioaicloud.com`.
+4. Copy from the request headers:
+   - `Authorization: Basic …` → `auth_token`
+   - `X-User-Id: …` → `user_id`
+   - `X-Device-Key: …` → `device_key`
+5. Paste into your local `config.json`.
+
+The Basic token decodes (best-effort) to `<userId>#ATK#<payload>`;
+`JioCloudAuth.peek_token_identity()` lets you sanity-check that the token
+matches your `user_id` locally.
+
+## 3. Token Lifetime & Rotation
+
+Session tokens are long-lived but revocable: logging out of the web session
+or re-registering the device invalidates them (SDK then receives `401`,
+surfaced as `AuthenticationError`). If a token expires, repeat step 2 above.
+
+## 4. Credential Safety Rules (project policy & yours)
+
+- Credentials are read **only** from local `config.json` or `JIOCLOUD_*`
+  environment variables.
+- They are transmitted **only** to official `*.jioaicloud.com` hosts over
+  TLS (allowlist enforced conceptually by the client's fixed base URLs).
+- This project has **zero telemetry** and never writes credentials anywhere
+  else.
+- Never commit `config.json` (keep it in `.gitignore`), never paste tokens
+  into issues, screenshots, or chat logs, and rotate by re-login if leaked.
+- Example files contain placeholders only; docs show redacted values.
+
+## 5. Error Semantics
+
+| HTTP | Meaning | SDK exception |
+|---|---|---|
+| 400 | Bad params/headers/body (see code) | `InvalidRequestError` (+ `.error_code`) |
+| 401 | Session expired/invalid | `AuthenticationError` |
+| 403 | Operation forbidden | `ForbiddenError` |
+| 404 | Unknown object/board key | `ObjectNotFoundError` |
+| 429 | Rate limited (auto-retried w/ backoff) | `RateLimitError` |
+| 5xx | Server fault (auto-retried) | `ServerError` |
+| network | DNS/TLS/reset (auto-retried) | `NetworkError` |
+
+Batch operations additionally surface per-object failures embedded in HTTP
+200 responses (`unprocessed[].object.errorCode`) as `InvalidRequestError`
+with the server's code attached.
+
+---
+
+# PAGE: API Reference (docs/API_REFERENCE.md)
+
+# API Reference — Unofficial Jio AI Cloud SDK
+
+All endpoints below were **verified against live production servers**
+(2026-08-25). Base URLs and the exact request/response shapes are documented;
+error codes reference [ERROR_CODES.md](ERROR_CODES.md).
+
+**Required headers on EVERY request (including bodiless GETs)** — see
+[AUTHENTICATION.md](AUTHENTICATION.md):
+
+```
+Authorization: Basic <session-token>
+X-User-Id: <32-char hex>
+X-Device-Key: <uuid>
+X-Device-Type: W
+X-Api-Key: c153b48e-d8a1-48a0-a40d-293f1dc5be0e      (public web-app constant)
+X-App-Secret: ODc0MDE2M2EtNGY0MC00YmU2LTgwZDUtYjNlZjIxZGRkZjlj
+X-Client-Details: clientType:WEB; appVersion:86.0.1
+Accept / Content-Type: application/json; charset=UTF-8   ← Content-Type REQUIRED even on GET
+User-Agent, Accept-Language
+```
+
+---
+
+## 1. Account & Session — `https://api.jioaicloud.com`
+
+| Method | Path | Purpose |
+|---|---|---|
+| GET | `/security/users` | Profile, quota, root folder key, devices |
+| GET | `/security/users/promotions` | Active/expired storage promotions |
+| GET | `/app/settings?os=web` | Backup policy & client settings |
+| POST | `/security/getokenforcookie` | Exchange web JWT for download nonce |
+
+### GET /security/users → 200
+```jsonc
+{
+  "userId": "…", "authProviderId": 4, "emailId": "…",
+  "firstName": "…", "status": "A",
+  "rootFolderKey": "20E0E5275DFE2C23E063441618ACCF27",   // per-account
+  "isMobileNumVerified": true, "isEmailIdVerified": true,
+  "mobileNumber": "+916****8825",
+  "quota": { "allocatedSpace": 107374182400, "usedSpace": …,
+             "photoUsage": …, "videoUsage": …, "audioUsage": …,
+             "documentUsage": …, "totalAllocatedQuota": …,
+             "totalUsedQuota": …, "paidPlanQuota": 0,
+             "defaultStorageSpace": …, "totalPromotionalQuota": 0 },
+  "devices": [ { "deviceName": "Web Device", "deviceKey": "uuid",
+                 "deviceType": "W", "platformType": "Chrome", … } ]
+}
+```
+
+SDK: `get_user_profile()`, `get_storage_quota()`, `list_devices()`,
+`get_app_settings()`, `get_promotions()`, `get_cookie_nonce(jwt)`
+
+---
+
+## 2. Metadata & Files — `https://jaws-api.jioaicloud.com`
+
+### Directory listing
+
+| Method | Path | Notes |
+|---|---|---|
+| GET | `/nms/metadata/defaultview/myfiles/v1` | Default view |
+| GET | `/nms/metadata` | Legacy view (supports `page` param) |
+
+Query params (both):
+- `limit` — page size (verified up to 2000)
+- `folderKey` — parent folder key (**required**)
+- `type` — **only `f` (files) or `w` (folders)**; anything else → `400 NMSOM0129`
+- `sort` — e.g. `+fileCreatedDate`, `-lastModifiedDate`, `+objectName`
+- `page` — offset page index (legacy endpoint)
+
+Response envelope:
+```jsonc
+{ "allocatedSpace": …, "usedSpace": …, "isUploadAllowed": true,
+  "objects": [ { /* object schema — see DATA_MODELS.md */ } ] }
+```
+
+SDK: `list_directory()`, `list_files()`, `list_folders()`,
+`stream_all_files()` (recursive walker; issues w+f queries per directory due
+to ISSUE-003), `search_files()` (client-side over full walk)
+
+### Batch metadata operations — `PUT /nms/metadata/1.0`
+
+```jsonc
+// request
+{ "objects": [ { "operation": "<OP>", "correlationId": "<userId>",
+                 "object": { /* FULL object echo — see below */ } } ] }
+// response 200
+{ "objects": [ /* processed ops with updated object */ ],
+  "unprocessed": [ { "operation": "...", "object": {
+      "objectKey": "...", "errorMessage": "...", "errorCode": "..." } } ],
+  "usedSpace": …, "isUploadAllowed": true }
+```
+
+Verified operations: `SETFAV`, `UNSETFAV`, `RENAME`, `MOVE`, `TRASH`.
+
+**Constraint (server-verified):** the object must be a *full echo* of the
+item's current server state. Missing fields cause silent rejection into
+`unprocessed[]`:
+
+| Missing field | Error surfaced in unprocessed |
+|---|---|
+| `objectName` | `TEJVF0001` constraint validation on objectName |
+| `sourceName` | `NMSOM0021` Source name is null or empty |
+
+For `TRASH`, the payload's `"status"` must be pre-set to `"T"` (see
+KNOWN_ISSUES.md (docs/KNOWN_ISSUES.md, ISSUE-001). The SDK resolves current state via
+`_resolve_objects()` before mutating.
+
+SDK: `rename_object()`, `move_object()`, `set_favorite()`, `delete_to_trash()`
+
+### Trash & restore
+
+| Method | Path | Body | Status |
+|---|---|---|---|
+| PUT | `/nms/metadata/restore` | `{"objectKeys": ["<key>", …]}` | ✅ verified |
+| GET | `/nms/trash?limit=&sort=` | — | ✅ verified |
+| ~~PUT~~ | ~~`/nms/metadata/delete`~~ | legacy delete — now silently rejects all keys | ❌ deprecated server-side |
+
+SDK: `delete_to_trash()` (uses TRASH op), `restore_from_trash()`, `list_trash()`
+Note: trash listing lags a few seconds after mutation (ISSUE-007).
+
+### Versions
+
+```
+GET /nms/metadata/version/<objectKey>  → 200
+{ "totalVersions": 1,
+  "objVersions": [ { "version": 1, "displayVersion": "V1",
+                     "createdDate": …, "isCurrentVersion": true, … } ] }
+```
+
+⚠️ Envelope key is `objVersions` (not `versions`). Unknown key → `404`.
+SDK: `get_version_history()`
+
+### Feeds & discovery (all GET, jaws-api)
+
+| Path | Query | Response envelope |
+|---|---|---|
+| `/nms/metadata/recent/objects` | — | `{objectsImgs:[…], objectsDocs:[…]}` |
+| `/nms/spotlights/metadata` | `page`, `limit` | `{spotLights:[…]}` |
+| `/nms/collshare/byme` | `page`, `limit`, `sort=-smd` | `{objects:[…]}` |
+| `/nms/headless/linkedapp/metadata` | `appcode=dgl`, `page`, `limit` | `{objects:[…]}` |
+| `/nms/manual/tag/recents` | — | `[ … ]` (bare array) |
+| `/nms/manual/tags/<objectKey>` | — | `[ … ]` (bare array) |
+| `/cspp/intg/doc/supported` | — | `{supportedExtensions:{view:[],edit:[],favIconUrls:{}}}` |
+
+SDK: `get_recent_objects()`, `get_spotlights()`, `get_shared_by_me()`,
+`get_linked_app_objects()`, `get_manual_tags()`, `get_recent_tags()`,
+`get_supported_office_extensions()`
+
+### Folders & sharing
+
+| Method | Path | Body | Status |
+|---|---|---|---|
+| POST | `/nms/folders` | `{"objectName","parentObjectKey","sourceName":"DRIVE"}` → **201** | ✅ |
+| POST | `/share/ulinks` | `{"objects":[{"objectKey"}…],"shareName":"25Aug2026_HHMMSS","shareType":"L"}` → **201** `{"shareURL":"https://www.jioaicloud.com/l/?u=<token>"}` | ✅ |
+
+SDK: `create_folder()`, `create_share_link(keys[])` (multi-object supported)
+
+---
+
+## 3. Downloads — `https://jaws-dl.jioaicloud.com`
+
+| Path | Purpose |
+|---|---|
+| `GET /download/files/<objectKey>` | Original binary stream (Content-Length set) |
+| `GET /download/avimages/<objectKey>` | Transcoded image/video thumbnail (404 if none exists) |
+
+SDK: `download_file()` (chunked, atomic `.part→final` rename, retry on
+5xx/network), `download_thumbnail()`, `download_all()` (thread-pool bulk)
+
+---
+
+## 4. Boards / Albums — `https://boards.jioaicloud.com`
+
+| Method | Path | Notes |
+|---|---|---|
+| GET | `/boards/sync/initial?page=0&limit=2000&albumType=p` | List boards (`albumType=p` personal) |
+| POST | `/boards` | Create → **201** with board object |
+| GET | `/boards/<boardKey>?page=0&limit=5000&sort=-lastModifiedDate` | Board details + files |
+| GET | `/invites/boards/<boardKey>/members` | Roster (`boardMembers[]`, owner `memberType:"O"`) |
+| PUT | `/invites/boards/<boardKey>/unjoin` | Leave board (body `[]`) — board disappears from your list if you created it |
+
+SDK: `list_boards()`, `create_board()`, `get_board()`, `get_board_members()`, `leave_board()`
+
+---
+
+## 5. Contacts — `https://jaws-contacts.jioaicloud.com`
+
+| Path | Required extras | Envelope |
+|---|---|---|
+| `GET /amiko/cab/contacts?sort=displayname&onlyActive=true&nextPageDate=1970-01-01 00:00:00.000000` | headers `X-Offset: 0`, `X-CHUNK-SIZE: 30` | `{contacts:[…]}` |
+| `GET /amiko/cab/emails` | headers `X-Offset: 0`, `X-CHUNK-SIZE: 30` | `{contactEmail:[…]}` |
+
+Missing `X-Offset` or malformed `nextPageDate` → `400 TEJRF0400`.
+SDK: `get_contacts(fetch_all=True)` auto-pages via X-Offset, `get_contact_emails()`
+
+---
+
+## 6. Messaging — `https://jaws-msg.jioaicloud.com`
+
+`GET /promo/banner/list` → `{"cards":[…]}` — SDK: `get_promo_banners()`
+
+---
+
+## 7. Agent Tools (JSON mode / MCP)
+
+16 tools registered in `jiocloud.AGENT_TOOLS_SCHEMA` (OpenAI/Anthropic
+function-calling format):
+
+`account_info`, `list_files`, `search_files`, `download_file*`,
+`download_all*`, `create_folder`, `move_to_trash*`, `restore_from_trash*`,
+`list_trash`, `share_link*`, `rename_object`, `set_favorite`,
+`version_history`, `recent_activity`, `list_boards`, `get_contacts`
+
+\* = requires `arguments.confirm = true`; otherwise the bridge returns
+`confirmation_required` without executing.
+
+Entry points:
+- `jiocloud.handle_tool_call(payload_dict_or_json)` — one-shot dispatcher
+- `JioAgentBridge(client).execute(tool, args)` — programmatic
+- `python cli.py agent schema|call|serve` — CLI (serve = stdio loop;
+  commands `schema`, `ping`, `quit` also supported)
+
+Guarantees: strict JSON envelopes, no credential leakage in output,
+typed error names, never raises to caller.
+
+---
+
+# PAGE: Data Models (docs/DATA_MODELS.md)
+
+# Data Models & Schemas
+
+Typed dataclasses live in `jiocloud/models.py`. Every field maps to a
+verified production response shape (2026-08 captures).
+
+---
+
+## JioUserProfile — from `GET /security/users`
+
+| Field | Type | Source key |
+|---|---|---|
+| `user_id` | str | `userId` |
+| `name` | str | `firstName` + `lastName` |
+| `email` | str | `emailId` |
+| `mobile_number` | str | `mobileNumber` (masked server-side) |
+| `root_folder_key` | str | `rootFolderKey` |
+| `status` | str | `status` (`"A"` = active) |
+| `is_mobile_verified` / `is_email_verified` | bool | `isMobileNumVerified` / `isEmailIdVerified` |
+| `quota` | JioStorageQuota | `quota{…}` |
+| `auth_provider_id` | int? | `authProviderId` |
+| `devices` | list[dict] | `devices[]` |
+| `raw_data` | dict | full payload |
+
+## JioStorageQuota
+
+| Field | Source key |
+|---|---|
+| `total_allocated_bytes` | `totalAllocatedQuota` / `allocatedSpace` |
+| `total_used_bytes` | `totalUsedQuota` / `usedSpace` |
+| `document_usage_bytes` | `documentUsage` |
+| `photo_usage_bytes` | `photoUsage` |
+| `video_usage_bytes` | `videoUsage` |
+| `audio_usage_bytes` | `audioUsage` |
+| `paid_plan_quota_bytes` | `paidPlanQuota` |
+| `default_storage_space_bytes` | `defaultStorageSpace` |
+| `total_promotional_quota_bytes` | `totalPromotionalQuota` |
+
+Properties: `total_allocated_gb`, `total_used_gb`, `usage_percentage`.
+
+## JioFile (= JioFolder alias) — object schema used across listings, trash, boards
+
+| Field | Type | Source key |
+|---|---|---|
+| `object_key` | str | `objectKey` (32-hex GUID) |
+| `parent_object_key` | str | `parentObjectKey` |
+| `object_name` | str | `objectName` |
+| `object_type` | str | `objectType` — `"FE"` file entry / `"FR"` folder reference |
+| `size_bytes` | int | `sizeInBytes` |
+| `mime_type` / `mime_subtype` | str | `mimeType` / `mimeSubType` |
+| `source_folder` | str | `sourceFolder` (original upload path for phone backups) |
+| `hash_md5` | str | `hash` |
+| `created_timestamp_ms` / `modified_timestamp_ms` | int? | `fileCreatedDate` / `lastModifiedDate` |
+| `status` | str | `status` (`A`=active, `T`=trashed) |
+| `is_hidden/locked/readonly/favorite` | bool | `isHidden/isLocked/isReadonly/isFavorite` |
+| `download_url_direct` | str | `url` (fallback constructed) |
+| `image_transcode_url` | str | `imageTranscodeUrl` |
+| `version`, `source_name` | int, str | `version`, `sourceName` (`DRIVE`,`UPA`,`repocopy`,…) |
+
+Properties: `is_folder`, `is_file`, `extension` (`.pdf` style), `human_size`,
+`created_datetime`, `modified_datetime`.
+
+Server-side computed display fields seen in payloads but not modeled
+(kept in `raw_data`): `displayName`, `iconName`, `tileName`, `gridDate`,
+`cMonthNo/cYear`, `latestVersion`, `recipientsObjRights`, etc.
+
+## JioShareLink — from `POST /share/ulinks`
+
+`share_url` (`shareURL`, format `https://www.jioaicloud.com/l/?u=<token>`),
+`nonce` (the `u=` token), `share_name`, `object_key` (comma-joined keys).
+
+## JioBoard
+
+`board_key/board_name/board_type/status/description/owner_user_id`,
+counts (`files_count`, `image_count`, `video_count`, `audio_count`,
+`comments_count`, `users_count`, `size_in_bytes`),
+`created_timestamp_ms`, `last_modified_timestamp_ms`.
+
+## JioBoardMember — from board members roster
+
+`user_id`, `first_name`, `member_type` (`"O"` owner), `member_status`
+(`"A"` active), `member_since_ms` (`memCreatedDate`).
+
+## JioFileVersion — from `/nms/metadata/version/<key>`
+
+⚠️ envelope: `{"totalVersions": N, "objVersions": [...]}`.
+Fields: `version_number` (`version`), `display_version`, timestamps,
+`is_current` (`isCurrentVersion`), `created_by_name`
+(`versionCreatedBy.firstName`), `last_updated_by`.
+
+## Agent envelope (JSON mode)
+
+```jsonc
+// request
+{"tool": "<name>", "arguments": {...}}
+// success
+{"ok": true, "result": ..., "count": 0}        // count optional
+// failure
+{"ok": false, "error": {"type": "InvalidRequestError", "message": "..."}}
+// guard
+{"ok": false, "error": {"type": "confirmation_required", "message": "..."}}
+```
+
+---
+
+# PAGE: Error Codes (docs/ERROR_CODES.md)
+
+# Error Codes — Production Taxonomy
+
+All codes below were **observed live** (2026-08-25) or present in verified
+captures. The SDK maps HTTP status to typed exceptions and, for batch
+operations, extracts the per-object `errorCode` from `unprocessed[]`.
+
+---
+
+## HTTP-level mapping
+
+| HTTP | Exception | Trigger | Handling |
+|---|---|---|---|
+| 400 | `InvalidRequestError` | bad params/headers/body | surfaced; `.error_code` carries server code |
+| 401 | `AuthenticationError` | expired/invalid session token | re-extract credentials |
+| 403 | `ForbiddenError` | operation not permitted | check account permissions |
+| 404 | `ObjectNotFoundError` | unknown object/board key | verify key via listing |
+| 429 | `RateLimitError` | throttled | **auto-retried** w/ exponential backoff |
+| 5xx | `ServerError` | upstream fault | **auto-retried** |
+| net | `NetworkError` | DNS/TLS/reset/timeout | **auto-retried** |
+
+Retry policy: `max_retries=3`, backoff `1.5 × 2^attempt` seconds
+(configurable in `JioCloudClient.__init__`). Non-retryable: 400/401/403/404.
+
+---
+
+## Server error codes (verified)
+
+| Code | Message (abridged) | Cause → Fix |
+|---|---|---|
+| `NMSOM0001` | "Accept language is null or empty." | Missing `Accept-Language` header → SDK always sends it |
+| `NMSOM0003` | "Content type is null or empty." | GET without `Content-Type` → SDK always sends it |
+| `NMSOM0021` | "Source name is null or empty." | Batch op (`RENAME`/`MOVE`/…) without `sourceName` in object echo → SDK resolves full state first |
+| `NMSOM0129` | "Kindly provide valid value for folder(W) or file(F) Search." | `type` query param ≠ `f`/`w` → only those values exist |
+| `NMSOM0135` | "Request is not proper" | Malformed batch op shape (e.g. unknown operation name) |
+| `TEJVF0001` | "constraint validation on objectName for value null" | Batch op missing `objectName` → full object echo required |
+| `TEJRF0400` | "Missing or Invalid value of X-Offset" / "nextPageDate must be a valid time…" | Contacts endpoints require `X-Offset` header AND `nextPageDate` param (`yyyy-MM-dd HH:mm:ss.SSSSSS`) → handled by `get_contacts()` |
+| `BRSOM0036` | "Content-Type header is not available in the request." | Boards service variant of NMSOM0003 |
+
+## Silent rejection pattern (important)
+
+Batch mutations return **HTTP 200** even when individual ops fail; failures
+appear inside:
+
+```jsonc
+{ "objects": [],   // succeeded ops
+  "unprocessed": [ { "operation": "TRASH",
+                     "correlationId": "…",
+                     "object": { "objectKey": "…",
+                                 "errorMessage": "…",   // may be absent!
+                                 "errorCode": "…" } } ] }
+```
+
+Note: some rejections carry **no error message at all** — just the bare
+object key. The SDK treats any entry in `unprocessed[]` as an
+`InvalidRequestError` and never reports silent failure as success.
+Historical example: the legacy `PUT /nms/metadata/delete` endpoint began
+rejecting every key this way after 2026-08-24 (see docs/KNOWN_ISSUES.md
+ISSUE-001); the fix routes deletes through the `TRASH` batch op with
+`status:"T"`.
+
+---
+
+## Client-side exceptions
+
+Defined in `jiocloud.exceptions`:
+
+```
+JioCloudError                      # base
+├── AuthenticationError            # 401
+├── ForbiddenError                 # 403
+├── ObjectNotFoundError            # 404 (+ local key resolution misses)
+├── InvalidRequestError            # 400 + batch unprocessed[] errors
+├── QuotaExceededError             # storage full (reserved)
+├── RateLimitError                 # 429
+├── ConflictError                  # 409
+├── PayloadTooLargeError           # 413
+├── ServerError                    # 5xx
+└── NetworkError                   # transport failures
+```
+
+Also raised locally: `FileExistsError` from `download_file()` when the
+destination exists and `overwrite=False`.
+
+---
+
+# PAGE: Known Issues (docs/KNOWN_ISSUES.md)
+
+# KNOWN ISSUES & SERVER BEHAVIOR NOTES
+
+This project practices **radical honesty**: everything below was discovered by
+live testing against production Jio AI Cloud servers (2026-08-25) and is
+documented so contributors know exactly where the gaps are.
+**Anyone can contribute a fix** — see "How to help" under each issue.
+
+Status legend: ✅ verified working · ⚠️ works with caveats · ❌ broken / server-rejected
+
+---
+
+## ✅ ISSUE-001 (RESOLVED): Move-to-trash requires `TRASH` op + `status:"T"`
+
+**History**
+The original traffic capture (2026-08-24 19:20) showed deletes working via:
+
+```
+PUT /nms/metadata/delete   body: {"objectKeys": ["<key>"]}
+```
+
+By the time of live verification (2026-08-25), that endpoint **silently
+rejected every key** — HTTP 200 but the op landed in an empty-detail
+`unprocessed[]` array, for new folders and old files alike, regardless of
+headers or payload shape.
+
+**Resolution:** a second capture (2026-08-24 21:16, contributed by the
+project owner) revealed the web client had switched to:
+
+```
+PUT /nms/metadata/1.0
+body: {"objects": [{"operation": "TRASH",
+                    "correlationId": "<userId>",
+                    "object": { ...FULL object echo..., "status": "T" }}]}
+```
+
+The decisive detail was `"status": "T"` pre-set in the request object.
+With the full echo plus `status:"T"`, items land in trash within seconds;
+`restore_from_trash` (`PUT /nms/metadata/restore`, unchanged contract) then
+verifiably restores them. The full create→rename→favorite→trash→restore→trash
+cycle now passes in `tests/live_verify.py`.
+
+**Lesson for contributors**: Jio's web client evolves its contracts without
+notice; when an endpoint starts failing, capture fresh traffic before
+assuming breakage. The SDK's `_metadata_op()` also surfaces per-object
+errors from `unprocessed[].object.errorMessage / errorCode` as typed
+exceptions instead of pretending success.
+
+---
+
+## ✅ ISSUE-002 (RESOLVED): Restore-from-trash verified
+
+Depends on ISSUE-001's flow. Verified end-to-end: trash → visible in
+`GET /nms/trash` → restore → gone from trash → re-trash → lands again.
+
+---
+
+## ⚠️ ISSUE-003: `type` query param only accepts `f` or `w`
+
+`GET /nms/metadata*?type=…` rejects anything except `f` (files) / `w`
+(folders) with `400 NMSOM0129`. There is **no "list everything at once"**
+mode, so recursive walks issue two queries per directory. Handled internally
+by `stream_all_files()`.
+
+---
+
+## ⚠️ ISSUE-004: Batch mutations require the FULL object echo
+
+`PUT /nms/metadata/1.0` operations (`SETFAV`, `UNSETFAV`, `RENAME`, `MOVE`,
+`TRASH`) fail constraint validation unless the object patch carries fields
+like `objectName` / `sourceName`:
+
+- missing `objectName` → `TEJVF0001`
+- missing `sourceName` → `NMSOM0021 "Source name is null or empty"`
+
+The SDK handles this by resolving current server state before mutating.
+Failure detail is returned inside `unprocessed[].object.errorMessage /
+errorCode`; `_metadata_op()` raises `InvalidRequestError` with that code.
+
+---
+
+## ⚠️ ISSUE-005: Contacts service requires undocumented headers/params
+
+`GET /amiko/cab/contacts` fails without BOTH:
+- `X-Offset: <n>` request header (error `TEJRF0400`)
+- `nextPageDate=yyyy-MM-dd HH:mm:ss.SSSSSS` query param (same error)
+
+`get_contacts()` sends both defaults; paging uses `X-CHUNK-SIZE`.
+Accounts with zero contacts return `{}` — behavior with many contacts is
+inferred from the pagination contract, not yet observed live. **Contributor
+with a populated address book: please verify page-walk works end-to-end.**
+
+---
+
+## ⚠️ ISSUE-006: Content-Type mandatory on bodiless GETs
+
+All Jio endpoints reject GETs without a `Content-Type` header
+(`NMSOM0003`, `BRSOM0036`). The SDK always sends it. Keep this in mind when
+adding new endpoints.
+
+---
+
+## ⚠️ ISSUE-007: Trash/listing eventual consistency (~2s)
+
+Newly created items may take a second or two to appear in listings;
+mutations can lag similarly. Tests use short settle delays. If you see flaky
+results in scripts, add small sleeps between mutate→list sequences.
+
+---
+
+## 📝 Not implemented (endpoints exist in captures but lack verified contracts)
+
+These appeared only as CORS preflights or were not exercised live; payloads
+are unknown, so we deliberately did NOT guess them:
+
+- Upload (the web app uploads via a different authenticated flow we have not
+  captured yet)
+- Board file add/remove, board edit/delete, board invite flows
+- Folder copy/duplicate operations
+- Manual tag create/delete (`GET` variants are implemented & verified)
+- Permanent (non-trash) deletion
+
+**Contributors welcome**: capture the traffic for any of these from the web
+UI and open an issue with the (redacted) request shape.
+
+---
+
+## Verification environment
+
+Findings above reproduced 2026-08-25 against production with a free-tier
+account (~39 GB used of 100 GB), Chrome 147 web-client header profile.
+Run `python tests/live_verify.py` yourself to reproduce the matrix locally.
+
+> **Note on token expiry:** session tokens are revocable and expire when the
+> web session is logged out or refreshed. A run against an expired token
+> shows every check failing with `AuthenticationError: 401 TEJGA0401` — that
+> is the SDK working correctly (typed errors, no silent retries). Refresh
+> `config.json` per [AUTHENTICATION.md](AUTHENTICATION.md), section 2, and re-run.
+
+---
+
+# PAGE: Disclaimer (docs/DISCLAIMER.md)
+
+# DISCLAIMER
+
+## 1. Unofficial Project — No Affiliation, No Endorsement
+
+This software (**Unofficial Jio AI Cloud Python SDK & CLI**) is an
+**independent, community-developed, unofficial project**.
+
+It is **not affiliated with, associated with, authorized by, endorsed by, or
+in any way officially connected with Reliance Jio Infocomm Limited ("Jio")
+or any of its subsidiaries, affiliates, or partners.**
+
+- "Jio", "Jio AI Cloud", "JioCloud", and all related names, logos, and marks
+  are **trademarks of their respective owners**.
+- Any use of these marks in this project is purely **nominative and
+  descriptive** — i.e., to identify the service this tool interoperates with —
+  and does not imply sponsorship, endorsement, approval, or partnership of
+  any kind.
+- No official Jio documentation was provided for this project; the protocol
+  knowledge here derives from observation of network traffic of the user's
+  own sessions and from public information.
+
+## 2. Personal Backup & Educational Use Only
+
+This tool is created strictly for:
+
+1. **Personal data portability** — accessing and downloading **your own**
+   files from **your own** Jio AI Cloud account;
+2. **Interoperability** — enabling your own automation and backup workflows;
+3. **Educational purposes** — studying how cloud storage clients communicate,
+   under fair-use guidelines.
+
+You may **only** use it with credentials for an account you own or are
+explicitly authorized to operate. Using it against accounts you do not
+control is strictly prohibited and may be unlawful.
+
+## 3. Use at Your Own Risk — "AS IS" Software
+
+The software is provided **"AS IS", WITH ALL FAULTS**, without warranty of
+any kind, express or implied, including but not limited to the warranties of
+merchantability, fitness for a particular purpose, and non-infringement.
+
+**You assume full responsibility for any use.** In particular, the authors
+and contributors are **NOT liable** for:
+
+- **Account actions**, including rate limiting, temporary blocks, suspension,
+  or termination imposed by Jio as a result of automated access from this
+  tool;
+- **Service changes** — Jio may change, break, deprecate, or restrict its
+  APIs at any time without notice, which can cause this tool to stop working
+  entirely;
+- **Data loss** — including accidental deletion, failed restores, overwrites,
+  or incomplete backups. Always keep independent copies of important data;
+- **Security incidents** arising from mishandling of your own credentials on
+  your own machine;
+- **Any direct, indirect, incidental, special, exemplary, or consequential
+  damages** (including loss of data, profits, or goodwill) arising from the
+  use of, or inability to use, this software.
+
+## 4. Data Privacy & Credential Safety
+
+- Your session token, user ID, device key, and any other credentials are
+  stored **purely locally** in `config.json` (or environment variables) on
+  your own computer.
+- The SDK transmits credentials **only** to official `*.jioaicloud.com` API
+  endpoints over TLS, and **never** to any third-party server, telemetry
+  endpoint, or analytics provider controlled by this project.
+- This project contains **no telemetry, tracking, or data collection**.
+- You are responsible for protecting `config.json`: never commit it to
+  source control, never share it, and revoke/re-login your web session if it
+  leaks.
+
+## 5. Rate Limiting & Fair Use Etiquette
+
+The client deliberately includes throttling defaults (small page delays,
+bounded worker counts). Even so, aggressive bulk operations may trigger
+server-side rate limits. Be considerate: run large syncs off-peak, prefer
+incremental backups, and respect any rate-limit responses (HTTP 429) the
+service returns.
+
+## 6. Compliance With Platform Terms Is Your Responsibility
+
+Automated access to a cloud storage platform may be restricted or prohibited
+by that platform's terms of service. Whether and how you may use this tool
+against your own account depends on the agreement between **you** and
+**Reliance Jio Infocomm Limited**. Nothing in this project constitutes legal
+advice. If in doubt, do not use this tool.
+
+---
+*Last reviewed: 2026-08. If you are a representative of Reliance Jio
+Infocomm Limited and believe any part of this project should be changed or
+removed, please open an issue in this project's repository.*
+
+---
+
+# PAGE: Legal Notes (docs/LEGAL.md)
+
+# LEGAL.md — Legal & Compliance Notes
+
+This document summarizes the legal posture of the **Unofficial Jio AI Cloud
+Python SDK & CLI** project. It is informational, not legal advice.
+
+---
+
+## 1. Project Identity & Trademark Attribution
+
+| Item | Statement |
+|---|---|
+| Status | Independent, unofficial, community-developed software |
+| Relationship to Jio | **None.** Not affiliated, associated, authorized, endorsed by, or officially connected with Reliance Jio Infocomm Ltd. ("Jio") or its subsidiaries |
+| Trademarks | "Jio", "Jio AI Cloud", "JioCloud" and related marks belong to their respective owners |
+| Mark usage | Nominative fair use only — to identify the service this tool interoperates with |
+
+## 2. Purpose Clause (Fair-Use / Interoperability)
+
+The sole intended purposes of this software are:
+
+1. **Personal data portability** for the account owner (download, inventory,
+   re-organize your own files);
+2. **Personal backup / disaster recovery** of data you already own;
+3. **Interoperability** with your own tooling via a documented client;
+4. **Education and research** on cloud-storage client protocols.
+
+It is explicitly **not** designed for, and must not be used for:
+accessing other people's accounts, bulk scraping, circumventing paywalls or
+quotas, redistributing copyrighted content, or any unlawful activity.
+
+## 3. License
+
+MIT License — see [`LICENSE`](LICENSE). The license includes an additional
+non-affiliation notice that forms part of the license text for this project.
+
+## 4. Warranty Disclaimer & Limitation of Liability
+
+THE SOFTWARE IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND. To the
+maximum extent permitted by law, the authors and contributors accept no
+liability for:
+
+- rate limits, throttling, account suspension, or other **account actions**
+  by the service provider;
+- **service changes** that break any feature without notice;
+- **data loss** of any kind (always maintain independent backups);
+- misuse, credential leakage caused by user error, or third-party claims.
+
+Full text: [`DISCLAIMER.md`](DISCLAIMER.md) §3–§4.
+
+## 5. Data Privacy & Credential Handling
+
+- Credentials live **only** in local `config.json` or `JIOCLOUD_*`
+  environment variables on the user's machine.
+- The SDK performs **zero telemetry**. The only network destinations are
+  official `*.jioaicloud.com` endpoints over TLS.
+- Example files, docs, and templates in this repository contain
+  **placeholders only** — never real credentials.
+- Recommended handling: set restrictive file permissions on `config.json`,
+  add it to `.gitignore`, rotate sessions periodically, and never paste
+  tokens into issue trackers or chat logs.
+
+## 6. Reverse-Engineering & Interoperability Notice
+
+Protocol details in this project were derived from observing network traffic
+of the author's own authenticated sessions (a standard technique for
+building interoperable clients) and from publicly served web assets. No
+proprietary source code, no DRM circumvention, and no access-control bypass
+is involved: every request uses the same authenticated session credentials
+the legitimate web client itself uses, on behalf of the same account owner.
+
+## 7. Takedown / Contact
+
+If you are a rights holder (including a representative of Reliance Jio
+Infocomm Limited) and believe any content here infringes your rights, open
+an issue in this project's repository and we will promptly review and, where
+appropriate, remove or amend the material.
+
+---
+
+# PAGE: Homepage (docs/index.md)
+
+# Unofficial Jio AI Cloud Python SDK, CLI & AI-Agent Tool Server
+
+A high-performance, **zero-dependency** (Python 3.8+ stdlib only) SDK, CLI,
+and AI-agent tool server for Jio AI Cloud storage — protocol knowledge
+reverse-engineered from the owner's own account traffic and verified against
+live production servers.
+
+!!! danger "UNSTABLE TARGET — Last verified: 2026-08-25 (26/26 checks passed)"
+
+    Jio AI Cloud has **no public API**. Endpoints change without notice and can
+    break at any time. Verified against production on **2026-08-25 (26/26
+    checks)**. Features may stop working at any moment — check
+    [KNOWN_ISSUES.md](KNOWN_ISSUES.md) for current status.
+
+> **UNOFFICIAL PROJECT.** Not affiliated with, associated with, authorized by,
+> endorsed by, or in any way officially connected with Reliance Jio Infocomm
+> Ltd. or its subsidiaries. "Jio" / "Jio AI Cloud" are trademarks of their
+> respective owners, used for nominative reference only. Built strictly for
+> personal data portability, backup of your OWN account, interoperability, and
+> education — see [DISCLAIMER.md](DISCLAIMER.md) and [LEGAL.md](LEGAL.md).
+
+[Get started](GET_CREDENTIALS.md){ .md-button .md-button--primary }
+[Browse the API](API_REFERENCE.md){ .md-button }
+
+## Feature Matrix
+
+| Area | Features |
+|---|---|
+| **Cataloging** | Streaming recursive file walker (2200+ files tested), directory listings (files/folders), full-text search across names & backup source paths |
+| **Downloads** | Chunked atomic downloads with progress callbacks, MD5 verified against server hash, multi-threaded bulk sync with skip-existing |
+| **Management** | Create folder, rename, move, favorite/unfavorite, trash, restore, version history |
+| **Sharing** | Public universal links (`https://www.jioaicloud.com/l/?u=...`) for one or many objects |
+| **Boards/Albums** | List, create, inspect members, get board details, leave board |
+| **Account** | Profile, quota breakdown (docs/photos/videos/audio), devices, promotions, app settings |
+| **Feeds** | Recent objects, spotlights, shared-by-me, DigiLocker linked-app objects, manual tags |
+| **AI Agents** | 16-tool JSON schema (OpenAI/Anthropic function-calling compatible), strict JSON envelope dispatcher, destructive-op confirmation guard, MCP-style stdio server |
+| **Robustness** | Retry with exponential backoff on 429/5xx/network faults, typed exception taxonomy, per-object error surfacing from batch `unprocessed[]` |
+| **Dependencies** | None — pure Python 3.8+ standard library |
+
+## Quickstart
+
+```bash
+# 1. Extract credentials from your own web session and validate them
+python examples/setup_credentials.py
+
+# 2. Verify the connection
+python cli.py info
+
+# 3. Back up everything
+python cli.py sync --dest ./backup --workers 6
+```
+
+Full walkthrough: [Getting Credentials](GET_CREDENTIALS.md).
+
+## Architecture
+
+```mermaid
+graph TD
+    Client[Python SDK / CLI / Agent] -->|Auth, profile, quota| API[api.jioaicloud.com]
+    Client -->|Metadata, folders, trash, share| JAWS[jaws-api.jioaicloud.com]
+    Client -->|Direct binary streaming| CDN[jaws-dl.jioaicloud.com]
+    Client -->|Shared albums & boards| Boards[boards.jioaicloud.com]
+    Client -->|Address book| Contacts[jaws-contacts.jioaicloud.com]
+    Client -->|Promo banners| Msg[jaws-msg.jioaicloud.com]
+```
+
+## Verification Status
+
+Latest live verification run: **2026-08-25 — 26/26 checks passed** against
+production with a free-tier account (~39 GB used of 100 GB). The reproducible
+matrix lives in [`tests/live_verify.py`](https://github.com/Ns81000/jiocloud_client/blob/main/tests/live_verify.py).
+Run it yourself:
+
+```bash
+python tests/live_verify.py
+```
+
+## AI Integration Assets
+
+Ready-made assets for wiring this SDK into any LLM agent:
+
+- [`ai/skills/jio-cloud-manager/SKILL.md`](https://github.com/Ns81000/jiocloud_client/tree/main/ai/skills/jio-cloud-manager) — installable AI skill
+- [`ai/tools/openai-function-schema.json`](https://github.com/Ns81000/jiocloud_client/blob/main/ai/tools/openai-function-schema.json) — OpenAI function-calling schema
+- [`ai/tools/anthropic-tools.json`](https://github.com/Ns81000/jiocloud_client/blob/main/ai/tools/anthropic-tools.json) — Anthropic tool-use schema
+- [`ai/prompts/system-prompt.txt`](https://github.com/Ns81000/jiocloud_client/blob/main/ai/prompts/system-prompt.txt) — paste-ready operational system prompt
+- [`llms.txt`](https://ns81000.github.io/jiocloud_client/llms.txt) / [`llms-full.txt`](https://ns81000.github.io/jiocloud_client/llms-full.txt) — LLM-oriented index and single-file full context
+
+## Badges
+
+![License](https://img.shields.io/badge/license-MIT-blue)
+![Python](https://img.shields.io/badge/python-%3E%3D3.8-blue)
+![Dependencies](https://img.shields.io/badge/dependencies-0-success)
+![GitHub repo](https://img.shields.io/github/stars/Ns81000/jiocloud_client?style=flat&label=stars)
+![GitHub issues](https://img.shields.io/github/issues/Ns81000/jiocloud_client)
+![Docs](https://img.shields.io/badge/docs-GitHub%20Pages-informational)
+![Live verified](https://img.shields.io/badge/live--verified-2026--08--25-orange)
+
+## Legal Summary
+
+Independent unofficial tool · personal data portability & education only · no
+warranty · you are responsible for compliance with Jio's terms for your
+account · credentials never leave your machine except to official
+`*.jioaicloud.com` endpoints over TLS · zero telemetry. Full text in
+[DISCLAIMER.md](DISCLAIMER.md), [LEGAL.md](LEGAL.md), and the [LICENSE](https://github.com/Ns81000/jiocloud_client/blob/main/LICENSE).

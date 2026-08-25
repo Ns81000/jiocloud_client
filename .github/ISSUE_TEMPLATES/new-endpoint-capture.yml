@@ -1,0 +1,63 @@
+name: New endpoint capture
+description: Share a captured endpoint the SDK does not implement yet (redacted).
+title: "[CAPTURE] <METHOD> <path>"
+labels: ["new-capture"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for extending protocol coverage. Capture traffic from **your own account only**
+        (DevTools → Network → right-click request → Copy as cURL), then REDACT before pasting:
+        strip Authorization, X-User-Id, X-Device-Key, cookies, and personal object names/paths.
+        We need the endpoint, header names, and payload shape — never your credentials.
+  - type: dropdown
+    id: method
+    attributes:
+      label: HTTP method
+      options:
+        - GET
+        - POST
+        - PUT
+        - DELETE
+    validations:
+      required: true
+  - type: input
+    id: path
+    attributes:
+      label: Full URL / path
+      placeholder: "https://jaws-api.jioaicloud.com/nms/..."
+    validations:
+      required: true
+  - type: textarea
+    id: purpose
+    attributes:
+      label: What the endpoint appears to do (observed in the web UI)
+    validations:
+      required: true
+  - type: textarea
+    id: headers
+    attributes:
+      label: Required header NAMES (values redacted)
+      placeholder: "e.g. X-Offset, X-CHUNK-SIZE, Content-Type"
+  - type: textarea
+    id: payload_shape
+    attributes:
+      label: Sanitized payload shape
+      placeholder: |
+        {
+          "objects": [
+            {"operation": "...", "object": {"...": "..."}}
+          ]
+        }
+  - type: textarea
+    id: response_shape
+    attributes:
+      label: Sanitized response envelope shape (keys only)
+      placeholder: '{"data": [...], "nextPageDate": "..."}'
+  - type: checkboxes
+    id: verification
+    attributes:
+      label: Verification status
+      options:
+        - label: I replayed this request outside the browser and confirmed it works with my own session headers
+        - label: I observed it only as a CORS preflight (payload unknown)
