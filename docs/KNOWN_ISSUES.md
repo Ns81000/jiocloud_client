@@ -127,6 +127,11 @@ are unknown, so we deliberately did NOT guess them:
 **Contributors welcome**: capture the traffic for any of these from the web
 UI and open an issue with the (redacted) request shape.
 
+Each of these gaps is tracked as a GitHub issue with detailed acceptance
+criteria — see the issue tracker for current status:
+upload (#2), board write flows (#3), permanent deletion (#4), manual tag
+mutations (#7), folder copy (#8).
+
 ---
 
 ## CAVEATS: ISSUE-008: Token identity segment can differ from `X-User-Id` after re-login
