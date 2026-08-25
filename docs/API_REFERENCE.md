@@ -1,5 +1,10 @@
 # API Reference — Unofficial Jio AI Cloud SDK
 
+> **UNSTABLE TARGET — Last verified: 2026-08-25 (26/26 checks passed).**
+> Jio AI Cloud has no public API. Endpoints change without notice and can
+> break at any time. Features may stop working at any moment — check
+> [KNOWN_ISSUES.md](KNOWN_ISSUES.md) for current status.
+
 All endpoints below were **verified against live production servers**
 (2026-08-25). Base URLs and the exact request/response shapes are documented;
 error codes reference [ERROR_CODES.md](ERROR_CODES.md).

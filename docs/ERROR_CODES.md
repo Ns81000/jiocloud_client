@@ -1,5 +1,10 @@
 # Error Codes — Production Taxonomy
 
+> **UNSTABLE TARGET — Last verified: 2026-08-25 (26/26 checks passed).**
+> Jio AI Cloud has no public API. Endpoints change without notice and can
+> break at any time. Features may stop working at any moment — check
+> [KNOWN_ISSUES.md](KNOWN_ISSUES.md) for current status.
+
 All codes below were **observed live** (2026-08-25) or present in verified
 captures. The SDK maps HTTP status to typed exceptions and, for batch
 operations, extracts the per-object `errorCode` from `unprocessed[]`.

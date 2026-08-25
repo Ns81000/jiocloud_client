@@ -1,42 +1,58 @@
-# Unofficial Jio AI Cloud Python SDK & CLI
+# Unofficial Jio AI Cloud Python SDK, CLI & AI-Agent Tools
+
+![License](https://img.shields.io/badge/license-MIT-blue)
+![Python](https://img.shields.io/badge/python-%3E%3D3.8-blue)
+![Dependencies](https://img.shields.io/badge/dependencies-0-success)
+![GitHub repo](https://img.shields.io/github/stars/Ns81000/jiocloud_client?style=flat&label=stars)
+![GitHub issues](https://img.shields.io/github/issues/Ns81000/jiocloud_client)
+[![Docs](https://img.shields.io/badge/docs-GitHub%20Pages-informational)](https://ns81000.github.io/jiocloud_client/)
+![Live verified](https://img.shields.io/badge/live--verified-2026--08--25-orange)
+
+> **UNOFFICIAL PROJECT.** Not affiliated with, associated with, authorized
+> by, endorsed by, or in any way officially connected with Reliance Jio
+> Infocomm Ltd. or its subsidiaries. "Jio" / "Jio AI Cloud" are trademarks of
+> their respective owners, used here for nominative reference only.
+
+> **UNSTABLE TARGET — Last verified: 2026-08-25 (26/26 checks passed).**
+> Jio AI Cloud has no public API. Endpoints change without notice and can
+> break at any time. Verified against production on 2026-08-25 (26/26 checks).
+> Features may stop working at any moment — check
+> [docs/KNOWN_ISSUES.md](docs/KNOWN_ISSUES.md) for current status.
 
 A high-performance, zero-dependency Python SDK, CLI, and **AI-agent tool
-server** for **Jio AI Cloud** storage — protocol-verified against live
-production servers.
+server** for **Jio AI Cloud** storage — protocol knowledge reverse-engineered
+from live network traffic of the owner's own account. Built strictly for
+**personal data portability, backup of your OWN account, interoperability,
+and education** — see [docs/DISCLAIMER.md](docs/DISCLAIMER.md) and
+[docs/LEGAL.md](docs/LEGAL.md) before use.
 
-> ⚠️ **UNOFFICIAL PROJECT.** Not affiliated with, associated with,
-> authorized by, endorsed by, or in any way officially connected with
-> Reliance Jio Infocomm Ltd. or its subsidiaries. "Jio" / "Jio AI Cloud"
-> are trademarks of their respective owners, used here for nominative
-> reference only. Built strictly for **personal data portability, backup of
-> your OWN account, interoperability, and education** — see
-> [DISCLAIMER.md](DISCLAIMER.md) and [LEGAL.md](LEGAL.md) before use.
+Documentation site: <https://ns81000.github.io/jiocloud_client/>
 
 ---
 
-## ✨ Key Capabilities
+## Key Capabilities
 
 | Area | Features |
 |---|---|
-| **Cataloging** | Streaming recursive file walker (10k+ files), directory listings (files/folders), full-text search across names & backup source paths |
-| **Downloads** | Single-file streaming with progress callback + atomic `.part` writes, multi-threaded bulk sync with skip-existing & resume-friendly manifests |
+| **Cataloging** | Streaming recursive file walker (2200+ files tested), directory listings (files/folders), full-text search across names & backup source paths |
+| **Downloads** | Chunked atomic downloads with progress callbacks, MD5 verified against server hash, multi-threaded bulk sync with skip-existing |
 | **Management** | Create folder, rename, move, favorite/unfavorite, trash, restore, version history |
-| **Sharing** | Public universal links (`https://www.jioaicloud.com/l/?u=…`) for one or many objects |
+| **Sharing** | Public universal links (`https://www.jioaicloud.com/l/?u=...`) for one or many objects |
 | **Boards/Albums** | List, create, inspect members, get board details, leave board |
 | **Account** | Profile, quota breakdown (docs/photos/videos/audio), devices, promotions, app settings |
-| **Extras** | Recent activity feed, spotlights, shared-by-me, DigiLocker linked-app objects, manual tags, Office-web capability matrix, promo banners, contacts |
-| **AI Agents** | 16-tool JSON schema (OpenAI/Anthropic function-calling compatible), strict JSON envelope dispatcher, MCP-style stdio server, destructive-op confirmation guard |
-| **Robustness** | Automatic retry w/ exponential backoff on 429/5xx/network faults, typed exception taxonomy, per-object error surfacing from batch `unprocessed[]` |
+| **Feeds** | Recent activity feed, spotlights, shared-by-me, DigiLocker linked-app objects, manual tags |
+| **AI Agents** | 16-tool JSON schema (OpenAI/Anthropic function-calling compatible), strict JSON envelope dispatcher, destructive-op confirmation guard, MCP-style stdio server |
+| **Robustness** | Retry with exponential backoff on 429/5xx/network faults, typed exception taxonomy, per-object error surfacing from batch `unprocessed[]` |
 | **Dependencies** | None — pure Python 3.8+ standard library |
 
 Every implemented endpoint was exercised against production; see
-[`KNOWN_ISSUES.md`](KNOWN_ISSUES.md) for server quirks discovered on the way
-and [`tests/live_verify.py`](tests/live_verify.py) for the reproducible
-26-check verification matrix (all passing).
+[`docs/KNOWN_ISSUES.md`](docs/KNOWN_ISSUES.md) for server quirks discovered
+on the way and [`tests/live_verify.py`](tests/live_verify.py) for the
+reproducible 26-check verification matrix (all passing as of 2026-08-25).
 
 ---
 
-## 🏗️ Service Architecture
+## Service Architecture
 
 ```mermaid
 graph TD
@@ -50,53 +66,65 @@ graph TD
 
 ---
 
-## 📦 Directory Structure
+## Directory Structure
 
 ```
 jiocloud_client/
 ├── README.md                  # This file
 ├── LICENSE                    # MIT + trademark/non-affiliation notice
-├── DISCLAIMER.md              # Full legal disclaimers
-├── LEGAL.md                   # Compliance summary
-├── KNOWN_ISSUES.md            # Verified server behaviors & gaps (contribute!)
+├── CHANGELOG.md               # Release history with verification stamps
+├── CONTRIBUTING.md            # Broken-endpoint reports, capture-based fixes
 ├── cli.py                     # Command-line interface (20 commands)
 ├── config.example.json        # Credential template (placeholders only)
+├── mkdocs.yml                 # Documentation site config (GitHub Pages)
+├── llms.txt / llms-full.txt   # LLM-oriented documentation indexes
 ├── jiocloud/                  # Core SDK package
-│   ├── __init__.py
 │   ├── client.py              # JioCloudClient — 30+ methods, retry engine
 │   ├── auth.py                # JioCloudAuth — header construction
 │   ├── agent_tools.py         # AI-agent schema, bridge, MCP stdio loop
 │   ├── models.py              # Typed dataclasses
 │   └── exceptions.py          # Typed error taxonomy
-├── docs/
+├── docs/                      # Also rendered at ns81000.github.io/jiocloud_client
 │   ├── API_REFERENCE.md       # Every verified endpoint + payloads
 │   ├── AUTHENTICATION.md      # Headers, token extraction, safety
+│   ├── GET_CREDENTIALS.md     # Credential walkthrough (console one-paste)
 │   ├── DATA_MODELS.md         # JSON schemas
-│   └── ERROR_CODES.md         # Server error codes seen in production
-├── examples/
-│   ├── 01_quickstart.py
-│   ├── 02_list_and_search.py
-│   ├── 03_batch_download.py
-│   ├── 04_folder_and_trash_management.py
-│   ├── 05_share_links.py
-│   ├── 06_agent_integration.py   # LLM/MCP tool-calling demo
-│   ├── 07_incremental_backup.py  # Manifest-based delta backup
-│   └── 08_inventory_export.py    # CSV/JSON export + analytics
+│   ├── ERROR_CODES.md         # Server error codes seen in production
+│   ├── KNOWN_ISSUES.md        # Verified server behaviors & gaps (contribute!)
+│   ├── DISCLAIMER.md          # Full legal disclaimers
+│   └── LEGAL.md               # Compliance summary
+├── ai/                        # AI integration assets
+│   ├── skills/jio-cloud-manager/SKILL.md
+│   ├── tools/openai-function-schema.json
+│   ├── tools/anthropic-tools.json
+│   ├── prompts/system-prompt.txt
+│   └── examples/agent-conversation.md
+├── examples/                  # 01_quickstart ... 08_inventory_export (+ setup_credentials.py)
 └── tests/
-    ├── test_models.py            # Offline unit tests
-    ├── test_client.py            # Live integration tests
-    └── live_verify.py            # 26-check live verification matrix
+    ├── test_models.py         # Offline unit tests
+    ├── test_client.py         # Live integration tests
+    └── live_verify.py         # 26-check live verification matrix
 ```
 
 ---
 
-## 🚀 Quickstart
+## Quickstart
 
 ### 1. Configuration
 
-Copy `config.example.json` → `config.json` and fill in **your own** session
-credentials (see [docs/AUTHENTICATION.md](docs/AUTHENTICATION.md) for how to
-extract them from your browser session):
+The easiest path: run the interactive validator, which walks you through
+extracting credentials from your own browser session, validates them live,
+and writes `config.json`:
+
+```bash
+python examples/setup_credentials.py
+```
+
+Full walkthrough (including a one-paste browser console extractor):
+**[docs/GET_CREDENTIALS.md](docs/GET_CREDENTIALS.md)**.
+
+Manual alternative: copy `config.example.json` to `config.json` and fill in
+**your own** session credentials:
 
 ```json
 {
@@ -139,8 +167,8 @@ for hit in client.search_files("invoice", filter_extension="pdf")[:5]:
 
 ```bash
 python cli.py info                 # account overview + usage bar
-python cli.py list --limit 20     # list root files
-python cli.py tree                # recursive tree view
+python cli.py list --limit 20      # list root files
+python cli.py tree                 # recursive tree view
 python cli.py search resume --ext pdf
 python cli.py download <key> -d ./out/
 python cli.py sync --dest ./backup --workers 6
@@ -184,11 +212,32 @@ Envelope contract:
 ```
 
 See [`examples/06_agent_integration.py`](examples/06_agent_integration.py)
-and [`docs/API_REFERENCE.md`](docs/API_REFERENCE.md § Agent Tools).
+and [`ai/examples/agent-conversation.md`](ai/examples/agent-conversation.md).
+
+### 5. Installing the AI assets
+
+Everything an assistant needs to operate this SDK is pre-built in [`ai/`](ai/):
+
+| Asset | Install into |
+|---|---|
+| [`ai/skills/jio-cloud-manager/SKILL.md`](ai/skills/jio-cloud-manager/SKILL.md) | Claude (as a skill/project knowledge), or any assistant that accepts a markdown instruction doc |
+| [`ai/tools/openai-function-schema.json`](ai/tools/openai-function-schema.json) | ChatGPT / any OpenAI-compatible host: pass the `tools` array in your API request |
+| [`ai/tools/anthropic-tools.json`](ai/tools/anthropic-tools.json) | Claude API: pass as the `tools` array |
+| [`ai/prompts/system-prompt.txt`](ai/prompts/system-prompt.txt) | Any LLM: paste as the system prompt alongside the tool schemas |
+| [`llms-full.txt`](https://ns81000.github.io/jiocloud_client/llms-full.txt) | Any agent that fetches context from a URL — complete docs in one file |
+
+For local agents, expose the SDK as a tool server:
+
+```bash
+python cli.py agent serve
+```
+
+Then wire your MCP-style host to send one JSON line per call:
+`{"tool": "...", "arguments": {...}}` and read one strict-JSON envelope back.
 
 ---
 
-## 🧪 Verification
+## Verification
 
 ```bash
 # Offline unit tests
@@ -200,25 +249,30 @@ python -m unittest discover -s tests
 python tests/live_verify.py
 ```
 
-Latest run: **26/26 passed** against production (2026-08-25).
+Latest run: **26/26 passed** against production (**2026-08-25**).
 
 ---
 
-## 📖 Documentation
+## Documentation
 
-- [API Reference](docs/API_REFERENCE.md) — endpoints, params, payloads, response shapes
+Site: <https://ns81000.github.io/jiocloud_client/>
+
+- [Getting Credentials](docs/GET_CREDENTIALS.md) — extract + validate session values
 - [Authentication](docs/AUTHENTICATION.md) — header contract & credential safety
+- [API Reference](docs/API_REFERENCE.md) — endpoints, params, payloads, response shapes
 - [Data Models](docs/DATA_MODELS.md) — entity schemas
 - [Error Codes](docs/ERROR_CODES.md) — production error taxonomy & handling
-- [Known Issues](KNOWN_ISSUES.md) — server quirks, gaps, how to contribute fixes
+- [Known Issues](docs/KNOWN_ISSUES.md) — server quirks, gaps, how to contribute fixes
+- [Changelog](CHANGELOG.md) · [Contributing](CONTRIBUTING.md)
+- [llms.txt](llms.txt) / [llms-full.txt](llms-full.txt) — for AI agents
 
 ---
 
-## ⚖️ Legal
+## Legal
 
 - [LICENSE](LICENSE) — MIT + trademark/non-affiliation notice
-- [DISCLAIMER.md](DISCLAIMER.md) — AS-IS warranty, liability limits, personal-backup clause, privacy notice
-- [LEGAL.md](LEGAL.md) — compliance summary & takedown contact
+- [DISCLAIMER.md](docs/DISCLAIMER.md) — AS-IS warranty, liability limits, personal-backup clause, privacy notice
+- [LEGAL.md](docs/LEGAL.md) — compliance summary & takedown contact
 
 **Summary**: independent unofficial tool · personal data portability &
 education only · no warranty · you are responsible for compliance with

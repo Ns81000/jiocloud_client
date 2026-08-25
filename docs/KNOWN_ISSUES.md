@@ -1,5 +1,10 @@
 # KNOWN ISSUES & SERVER BEHAVIOR NOTES
 
+> **UNSTABLE TARGET — Last verified: 2026-08-25 (26/26 checks passed).**
+> Jio AI Cloud has no public API. Endpoints change without notice and can
+> break at any time. Features may stop working at any moment — check
+> [KNOWN_ISSUES.md](KNOWN_ISSUES.md) for current status.
+
 This project practices **radical honesty**: everything below was discovered by
 live testing against production Jio AI Cloud servers (2026-08-25) and is
 documented so contributors know exactly where the gaps are.

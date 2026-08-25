@@ -1,5 +1,7 @@
 # LEGAL.md — Legal & Compliance Notes
 
+> **Note:** This project targets an UNSTABLE, unofficial API. Last verified against production: 2026-08-25 (26/26 checks). Endpoints can break at any time — see KNOWN_ISSUES.md.
+
 This document summarizes the legal posture of the **Unofficial Jio AI Cloud
 Python SDK & CLI** project. It is informational, not legal advice.
 

@@ -1,5 +1,10 @@
 # Authentication & Security
 
+> **UNSTABLE TARGET — Last verified: 2026-08-25 (26/26 checks passed).**
+> Jio AI Cloud has no public API. Endpoints change without notice and can
+> break at any time. Features may stop working at any moment — check
+> [KNOWN_ISSUES.md](KNOWN_ISSUES.md) for current status.
+
 ## 1. Header Contract (verified against production)
 
 Every request — **including bodiless GETs** — must carry:

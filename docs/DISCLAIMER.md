@@ -1,5 +1,7 @@
 # DISCLAIMER
 
+> **Note:** This project targets an UNSTABLE, unofficial API. Last verified against production: 2026-08-25 (26/26 checks). Endpoints can break at any time — see KNOWN_ISSUES.md.
+
 ## 1. Unofficial Project — No Affiliation, No Endorsement
 
 This software (**Unofficial Jio AI Cloud Python SDK & CLI**) is an
